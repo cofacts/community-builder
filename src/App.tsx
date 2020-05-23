@@ -1,25 +1,41 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Route, Switch } from 'react-router-dom';
+
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
+
+import Home from './pages/Home';
+import APIStats from './pages/APIStats';
+import EditorWorks from './pages/EditorWorks';
+import BigNum from './pages/BigNum';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <AppBar color="secondary" position="static">
+        <Toolbar>
+          <Typography variant="h6">Cofacts Community Builder</Typography>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="lg">
+        <Switch>
+          <Route path="/">
+            <Home />
+          </Route>
+          <Route path="/stats">
+            <APIStats />
+          </Route>
+          <Route path="/editorworks">
+            <EditorWorks />
+          </Route>
+          <Route path="/bignum">
+            <BigNum />
+          </Route>
+        </Switch>
+      </Container>
+    </>
   );
 }
 
