@@ -12,7 +12,7 @@ import APIStats from './pages/APIStats';
 import EditorWorks from './pages/EditorWorks';
 import BigNum from './pages/BigNum';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   titleLink: {
     color: 'inherit',
     textDecoration: 'none',
@@ -20,9 +20,12 @@ const useStyles = makeStyles({
       textDecoration: 'underline',
     },
   },
-});
+  gridContainer: {
+    marginTop: theme.spacing(2),
+  },
+}));
 
-function App() {
+const App: React.FC = () => {
   const classes = useStyles();
 
   return (
@@ -34,7 +37,7 @@ function App() {
           </Link>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="lg">
+      <Container classes={{ root: classes.gridContainer }} maxWidth="lg">
         <Switch>
           <Route exact path="/">
             <Home />
@@ -52,6 +55,6 @@ function App() {
       </Container>
     </>
   );
-}
+};
 
 export default App;

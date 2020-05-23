@@ -1,7 +1,7 @@
 import React from 'react';
 
-function BigNum(): JSX.Element {
+const BigNum: React.FC = () => {
   return <div>Instant</div>;
-}
+};
 
 export default BigNum;

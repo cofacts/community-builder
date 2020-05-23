@@ -8,14 +8,11 @@ import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 
-const useStyles = makeStyles((theme) => ({
-  gridContainer: {
-    marginTop: theme.spacing(2),
-  },
+const useStyles = makeStyles({
   link: {
     textDecoration: 'none',
   },
-}));
+});
 
 type FunctionButtonProps = {
   to: LinkProps['to'];
@@ -23,11 +20,11 @@ type FunctionButtonProps = {
   description: string;
 };
 
-function FunctionButton({
+const FunctionButton: React.FC<FunctionButtonProps> = ({
   to,
   title,
   description,
-}: FunctionButtonProps): JSX.Element {
+}) => {
   const classes = useStyles();
 
   return (
@@ -46,13 +43,11 @@ function FunctionButton({
       </Link>
     </Grid>
   );
-}
+};
 
-function Home() {
-  const classes = useStyles();
-
+const Home: React.FC = () => {
   return (
-    <Grid classes={{ root: classes.gridContainer }} container spacing={2}>
+    <Grid container spacing={2}>
       <FunctionButton
         to="/stats"
         title="Statistics"
@@ -70,6 +65,6 @@ function Home() {
       />
     </Grid>
   );
-}
+};
 
 export default Home;

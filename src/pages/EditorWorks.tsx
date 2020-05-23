@@ -1,7 +1,7 @@
 import React from 'react';
 
-function EditorWorks(): JSX.Element {
+const EditorWorks: React.FC = () => {
   return <div>Thanks editor</div>;
-}
+};
 
 export default EditorWorks;
