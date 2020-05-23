@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
 import { makeStyles } from '@material-ui/core/styles';
+import FUN_NUMBERS from '../lib/funNumbers';
 
 const POLLING_INTERVAL = 5000;
 
@@ -92,10 +93,24 @@ const BigNumDisplay: React.FC<BigNumDisplayProps> = ({ start, panelType }) => {
     return <div>{error.toString()}</div>;
   }
 
+  const number = data.ListArticles?.totalCount as number | null;
+  const numberStr = number === null ? '' : number.toString();
+
+  if (number && number in FUN_NUMBERS) {
+    const { top, bottom } = FUN_NUMBERS[number];
+    return (
+      <div className={classes.display}>
+        {top && <p>{top}</p>}
+        <p>{numberStr}</p>
+        {bottom && <p>{bottom}</p>}
+      </div>
+    );
+  }
+
   return (
     <div className={classes.display}>
       <p>{top(start)}</p>
-      <p>{data.ListArticles?.totalCount}</p>
+      <p>{numberStr}</p>
       <p>{bottom(start)}</p>
     </div>
   );
