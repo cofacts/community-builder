@@ -10,8 +10,9 @@ Discussion: https://g0v.hackmd.io/@mrorz/B1X4EkJcU#New-idea-Social-media-toolkit
 ## Development
 
 ```
-# Install dependency
+# Install dependency, initialize .env file for development
 $ npm install
+$ cp .env.sample .env.local
 
 # Start dev server
 $ npm start
