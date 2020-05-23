@@ -21,7 +21,7 @@ function App() {
       </AppBar>
       <Container maxWidth="lg">
         <Switch>
-          <Route path="/">
+          <Route exact path="/">
             <Home />
           </Route>
           <Route path="/stats">
