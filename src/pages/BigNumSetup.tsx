@@ -12,6 +12,8 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 
+import { PanelType } from './BigNum';
+
 const useStyles = makeStyles((theme) => ({
   setup: {
     margin: `${theme.spacing(2)}px auto`,
@@ -55,12 +57,12 @@ const BigNumSetup: React.FC = () => {
           </FormLabel>
           <FormGroup>
             <FormControlLabel
-              control={<Checkbox name="panels" value="article" />}
+              control={<Checkbox name="panels" value={PanelType.replied} />}
               label="Replied articles"
             />
             <FormControlLabel
-              control={<Checkbox name="panels" value="feedback" />}
-              label="Feedbacks added"
+              control={<Checkbox name="panels" value={PanelType.useful} />}
+              label="Article with useful feedback"
             />
           </FormGroup>
         </CardContent>
