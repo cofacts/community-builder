@@ -10,6 +10,7 @@ import Container from '@material-ui/core/Container';
 import Home from './pages/Home';
 import APIStats from './pages/APIStats';
 import EditorWorks from './pages/EditorWorks';
+import BigNumSetup from './pages/BigNumSetup';
 import BigNum from './pages/BigNum';
 
 const useStyles = makeStyles((theme) => ({
@@ -47,6 +48,9 @@ const App: React.FC = () => {
           </Route>
           <Route path="/editorworks">
             <EditorWorks />
+          </Route>
+          <Route path="/bignum/setup">
+            <BigNumSetup />
           </Route>
           <Route path="/bignum">
             <BigNum />

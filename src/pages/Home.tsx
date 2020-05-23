@@ -59,7 +59,7 @@ const Home: React.FC = () => {
         description="List of recent works from editors"
       />
       <FunctionButton
-        to="/bignum"
+        to="/bignum/setup"
         title="Big Numbers"
         description="Instant number display to project in meetups"
       />
