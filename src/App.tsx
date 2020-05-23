@@ -18,7 +18,7 @@ const useStyles = makeStyles({
     textDecoration: 'none',
     '&:hover': {
       textDecoration: 'underline',
-    }
+    },
   },
 });
 
