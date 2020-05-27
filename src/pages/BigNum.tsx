@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 import { makeStyles } from '@material-ui/core/styles';
 import FUN_NUMBERS from '../lib/funNumbers';
 
-const MARGIN = 40;
+const MARGIN = 80;
 const POLLING_INTERVAL = 5000;
 
 export enum PanelType {
@@ -31,8 +31,8 @@ type Setup = {
 
 const PANELS_SETUP = {
   [PanelType.replied]: {
-    top: (start: Setup['start']) => `自 ${start.toLocaleString()} 起回覆了`,
-    bottom: (start: Setup['start']) => '則訊息',
+    top: '回覆了',
+    bottom: '則訊息',
     query: gql`
       query BigNumOfReplied($startTime: String) {
         ListArticles(filter: { repliedAt: { GTE: $startTime } }) {
@@ -42,8 +42,8 @@ const PANELS_SETUP = {
     `,
   },
   [PanelType.useful]: {
-    top: (start: Setup['start']) => `自 ${start.toLocaleString()} 起有`,
-    bottom: (start: Setup['start']) => '則訊息被有用回應覆蓋',
+    top: '新增了',
+    bottom: '則訊息被有用回應覆蓋',
     query: gql`
       query BigNumOfUseful($startTime: String) {
         ListArticles(filter: { repliedAt: { GTE: $startTime } }) {
@@ -54,7 +54,7 @@ const PANELS_SETUP = {
   },
 } as const;
 
-const DISPLAY_SIZE = 600;
+const DISPLAY_SIZE = 768;
 
 const useStyles = makeStyles({
   displays: {
@@ -80,17 +80,34 @@ const useStyles = makeStyles({
     flexFlow: 'column',
     justifyContent: 'space-around',
     textAlign: 'center',
+    '& > p': {
+      margin: 0,
+    },
   },
-  small: {
-    margin: 0,
+  time: {
     fontSize: 36,
     fontWeight: 200,
   },
-  big: {
-    margin: 0,
+  top: {
+    fontSize: 64,
+    fontWeight: 600,
+  },
+  bottom: {
+    fontSize: 44,
+    fontWeight: 600,
+  },
+  number: {
     fontSize: 360,
     lineHeight: 1,
     fontWeight: 400,
+  },
+  funNumber: {
+    fontSize: 360,
+    fontWeight: 100,
+  },
+  funParagraph: {
+    fontSize: 84,
+    fontWeight: 600,
   },
   border: {
     position: 'absolute',
@@ -137,9 +154,9 @@ const BigNumDisplay: React.FC<BigNumDisplayProps> = ({
     return (
       <>
         <div {...rootProps}>
-          {top && <p className={classes.small}>{top}</p>}
-          <p className={classes.big}>{numberStr}</p>
-          {bottom && <p className={classes.small}>{bottom}</p>}
+          {top && <p className={classes.funParagraph}>{top}</p>}
+          <p className={classes.funNumber}>{numberStr}</p>
+          {bottom && <p className={classes.funParagraph}>{bottom}</p>}
         </div>
         <div className={classes.border} />
       </>
@@ -148,9 +165,10 @@ const BigNumDisplay: React.FC<BigNumDisplayProps> = ({
 
   return (
     <div {...rootProps}>
-      <p className={classes.small}>{top(start)}</p>
-      <p className={classes.big}>{numberStr}</p>
-      <p className={classes.small}>{bottom(start)}</p>
+      <p className={classes.time}>自 {start.toLocaleString()} 起</p>
+      <p className={classes.top}>{top}</p>
+      <p className={classes.number}>{numberStr}</p>
+      <p className={classes.bottom}>{bottom}</p>
     </div>
   );
 };
