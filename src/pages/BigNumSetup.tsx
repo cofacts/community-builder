@@ -57,12 +57,24 @@ const BigNumSetup: React.FC = () => {
           </FormLabel>
           <FormGroup>
             <FormControlLabel
-              control={<Checkbox name="panels" value={PanelType.replied} />}
+              control={
+                <Checkbox
+                  name="panels"
+                  value={PanelType.replied}
+                  defaultChecked
+                />
+              }
               label="Replied articles"
             />
             <FormControlLabel
-              control={<Checkbox name="panels" value={PanelType.useful} />}
-              label="Article with useful feedback"
+              control={
+                <Checkbox
+                  name="panels"
+                  value={PanelType.feedback}
+                  defaultChecked
+                />
+              }
+              label="Feedbacks"
             />
           </FormGroup>
         </CardContent>

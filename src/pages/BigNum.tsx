@@ -11,7 +11,7 @@ const POLLING_INTERVAL = 5000;
 
 export enum PanelType {
   replied = 'replied',
-  useful = 'useful',
+  feedback = 'feedback',
 }
 
 /**
@@ -41,9 +41,9 @@ const PANELS_SETUP = {
       }
     `,
   },
-  [PanelType.useful]: {
+  [PanelType.feedback]: {
     top: '新增了',
-    bottom: '則訊息被有用回應覆蓋',
+    bottom: '則評價',
     query: gql`
       query BigNumOfFeedbacks($startTime: String) {
         query: ListArticleReplyFeedbacks(
