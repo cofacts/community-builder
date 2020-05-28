@@ -35,7 +35,7 @@ const PANELS_SETUP = {
     bottom: '則訊息',
     query: gql`
       query BigNumOfReplied($startTime: String) {
-        ListArticles(filter: { repliedAt: { GTE: $startTime } }) {
+        query: ListArticles(filter: { repliedAt: { GTE: $startTime } }) {
           totalCount
         }
       }
@@ -45,8 +45,10 @@ const PANELS_SETUP = {
     top: '新增了',
     bottom: '則訊息被有用回應覆蓋',
     query: gql`
-      query BigNumOfUseful($startTime: String) {
-        ListArticles(filter: { repliedAt: { GTE: $startTime } }) {
+      query BigNumOfFeedbacks($startTime: String) {
+        query: ListArticleReplyFeedbacks(
+          filter: { createdAt: { GTE: $startTime } }
+        ) {
           totalCount
         }
       }
@@ -146,7 +148,7 @@ const BigNumDisplay: React.FC<BigNumDisplayProps> = ({
     return <div {...rootProps}>{error.toString()}</div>;
   }
 
-  const number = data.ListArticles?.totalCount as number | null;
+  const number = data.query?.totalCount as number | null;
   const numberStr = number === null ? '' : number.toString();
 
   if (number && number in FUN_NUMBERS) {
