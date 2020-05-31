@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
 import { makeStyles } from '@material-ui/core/styles';
+import { isSomeEnum } from '../lib/util';
 import FUN_NUMBERS from '../lib/funNumbers';
 
 const MARGIN = 80;
@@ -216,10 +217,16 @@ const BigNum: React.FC = () => {
   const classes = useStyles();
 
   const searchParams = new URLSearchParams(search);
-  const start = searchParams.get('start') as string; // Local time string, not UTC timestamp yet
-  const panels = searchParams.getAll('panels') as Setup['panels'];
+  const startParam = searchParams.get('start');
+  const panelsParms = searchParams.getAll('panels');
+  const startDate = startParam ? new Date(startParam) : new Date();
 
-  const startDate = (start ? new Date(start) : new Date()) as Setup['start'];
+  const panels = panelsParms.map((param) => {
+    if (!isSomeEnum(PanelType)(param)) {
+      throw new Error('panels must be one of PanelType.');
+    }
+    return PanelType[param];
+  });
 
   return (
     <div className={classes.displays}>
