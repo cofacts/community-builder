@@ -7,6 +7,9 @@ const client = new ApolloClient({
   link: ApolloLink.from([
     new BatchHttpLink({
       uri: `${process.env.REACT_APP_API_URL}/graphql`,
+      headers: {
+        'x-app-id': 'RUMORS-SITE',
+      },
     }),
   ]),
   cache: new InMemoryCache(),
