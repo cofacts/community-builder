@@ -13,5 +13,5 @@ export function getThousandSep(num: number): string {
  */
 export function isSomeEnum<T>(e: T) {
   return (token: any): token is T[keyof T] =>
-    Object.values(e).includes(token as T[keyof T])
-};
+    Object.values(e).includes(token as T[keyof T]);
+}
