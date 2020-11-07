@@ -1,6 +1,5 @@
 import React from 'react';
-import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
+import { useLoadApiStatsQuery } from '../types';
 import { getThousandSep } from '../lib/util';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -11,22 +10,6 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 
 const POLLING_INTERVAL = 5000;
-
-const STATS_QUERY = gql`
-  query LOAD_API_STATS {
-    allArticles: ListArticles {
-      totalCount
-    }
-    allRepliedArticles: ListArticles(filter: { replyCount: { GTE: 1 } }) {
-      totalCount
-    }
-    articlesHasUsefulReplies: ListArticles(
-      filter: { hasArticleReplyWithMorePositiveFeedback: true }
-    ) {
-      totalCount
-    }
-  }
-`;
 
 type StatItemProps = {
   name: string;
@@ -49,7 +32,7 @@ const StatItem: React.FC<StatItemProps> = ({ name, value }) => {
 };
 
 const APIStats: React.FC = () => {
-  const { data, loading } = useQuery(STATS_QUERY, {
+  const { data, loading } = useLoadApiStatsQuery({
     pollInterval: POLLING_INTERVAL,
   });
 
@@ -65,15 +48,15 @@ const APIStats: React.FC = () => {
     <Grid container spacing={2}>
       <StatItem
         name="All messages"
-        value={getThousandSep(+data?.allArticles?.totalCount)}
+        value={getThousandSep(data?.allArticles?.totalCount || 0)}
       />
       <StatItem
         name="Replied messages"
-        value={getThousandSep(+data?.allRepliedArticles?.totalCount)}
+        value={getThousandSep(data?.allRepliedArticles?.totalCount || 0)}
       />
       <StatItem
         name="Has useful replies"
-        value={getThousandSep(+data?.articlesHasUsefulReplies?.totalCount)}
+        value={getThousandSep(data?.articlesHasUsefulReplies?.totalCount || 0)}
       />
     </Grid>
   );

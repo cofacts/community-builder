@@ -1,0 +1,13 @@
+query LoadAPIStats {
+  allArticles: ListArticles {
+    totalCount
+  }
+  allRepliedArticles: ListArticles(filter: { replyCount: { GTE: 1 } }) {
+    totalCount
+  }
+  articlesHasUsefulReplies: ListArticles(
+    filter: { hasArticleReplyWithMorePositiveFeedback: true }
+  ) {
+    totalCount
+  }
+}
