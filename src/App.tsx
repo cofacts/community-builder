@@ -9,6 +9,8 @@ import Container from '@material-ui/core/Container';
 
 import Home from './pages/Home';
 import APIStats from './pages/APIStats';
+import NeedToCheckSetup from './pages/NeedToCheckSetup';
+import NeedToCheck from './pages/NeedToCheck';
 import EditorWorks from './pages/EditorWorks';
 import BigNumSetup from './pages/BigNumSetup';
 import BigNum from './pages/BigNum';
@@ -45,6 +47,12 @@ const App: React.FC = () => {
           </Route>
           <Route path="/stats">
             <APIStats />
+          </Route>
+          <Route path="/need-to-check/setup">
+            <NeedToCheckSetup />
+          </Route>
+          <Route path="/need-to-check">
+            <NeedToCheck />
           </Route>
           <Route path="/editorworks">
             <EditorWorks />

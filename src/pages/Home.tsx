@@ -54,6 +54,11 @@ const Home: React.FC = () => {
         description="Real-time statistics from Cofacts API"
       />
       <FunctionButton
+        to="/need-to-check/setup"
+        title="Message to check"
+        description="View list of messages that needs to be checked by editors"
+      />
+      <FunctionButton
         to="/editorworks"
         title="Thank you editors"
         description="List of recent works from editors"
