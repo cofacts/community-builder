@@ -1,53 +1,15 @@
+/* eslint-disable no-console */
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import {
-  useListRepliesQuery,
-  ListRepliesQuery,
-  ReplyConnectionPageInfo,
-} from '../types';
-import { stringify } from 'querystring';
+import { useLocation } from 'react-router-dom';
+import { DataGrid, ColDef } from '@material-ui/data-grid';
 
-function Pagination({
-  pageInfo = {},
-  edges = [],
-}: {
-  pageInfo: ReplyConnectionPageInfo;
-  edges: NonNullable<ListRepliesQuery['ListReplies']>['edges'];
-}) {
-  const { firstCursor, lastCursor } = pageInfo;
-  if (!firstCursor || !lastCursor) {
-    return null;
-  }
+import { useListRepliesQuery } from '../types';
 
-  const firstCursorOfPage = edges.length && edges[0] && edges[0].cursor;
-  const lastCursorOfPage =
-    edges.length && edges[edges.length - 1] && edges[edges.length - 1].cursor;
-
-  return (
-    <p>
-      {firstCursor && firstCursor !== firstCursorOfPage && (
-        <Link
-          to={{
-            pathname: '/editorworks',
-            search: stringify({ before: firstCursorOfPage, after: undefined }),
-          }}
-        >
-          Prev
-        </Link>
-      )}
-      {lastCursor && lastCursor !== lastCursorOfPage && (
-        <Link
-          to={{
-            pathname: '/editorworks',
-            search: stringify({ after: lastCursorOfPage, before: undefined }),
-          }}
-        >
-          Next
-        </Link>
-      )}
-    </p>
-  );
-}
+const COLUMNS: ColDef[] = [
+  { field: 'author', headerName: 'Author' },
+  { field: 'text', headerName: 'Text' },
+  { field: 'createdAt', headerName: 'Created At' },
+];
 
 const EditorWorks: React.FC = () => {
   const { search } = useLocation();
@@ -74,42 +36,19 @@ const EditorWorks: React.FC = () => {
   }
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Text</th>
-          <th>Author</th>
-          <th>Created at</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.ListReplies.edges.map(({ node }) => (
-          <tr key={node.id}>
-            <td>
-              <a href={`https://cofacts.hacktabl.org/reply/${node.id}`}>
-                {node.text}
-              </a>
-            </td>
-            <td>{node?.user?.name}</td>
-            <td>
-              <a href={`https://cofacts.hacktabl.org/reply/${node.id}`}>
-                {node.createdAt}
-              </a>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={3}>
-            <Pagination
-              pageInfo={data.ListReplies.pageInfo}
-              edges={data.ListReplies.edges}
-            />
-          </td>
-        </tr>
-      </tfoot>
-    </table>
+    <DataGrid
+      rows={data.ListReplies.edges.map(({ node }) => node)}
+      columns={COLUMNS}
+      pagination
+      autoHeight
+      pageSize={25}
+      rowCount={data.ListReplies.totalCount}
+      paginationMode="server"
+      onPageChange={(params) => {
+        console.info('p', params);
+      }}
+      loading={loading}
+    />
   );
 };
 
