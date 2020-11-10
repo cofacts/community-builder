@@ -5,7 +5,7 @@ import { styled } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
 import { DataGrid, ColDef } from '@material-ui/data-grid';
 
-import { useListRepliesQuery, ListRepliesQuery } from '../types';
+import { useListRepliesQuery, ListRepliesQuery } from '../../types';
 
 type User = NonNullable<
   ListRepliesQuery['ListReplies']
