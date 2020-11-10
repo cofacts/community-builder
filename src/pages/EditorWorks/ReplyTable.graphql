@@ -1,0 +1,29 @@
+query ReplyListStatInReplyTable {
+  ListReplies {
+    totalCount
+    pageInfo {
+      firstCursor
+      lastCursor
+    }
+  }
+}
+
+query ReplyListInReplyTable($after: String, $pageSize: Int) {
+  ListReplies(
+    orderBy: [{ createdAt: DESC }]
+    after: $after
+    first: $pageSize
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        text
+        user {
+          name
+        }
+        createdAt
+      }
+    }
+  }
+}

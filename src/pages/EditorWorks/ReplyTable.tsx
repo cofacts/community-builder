@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
 import { DataGrid, ColDef } from '@material-ui/data-grid';
 
-import { useListRepliesQuery, ListRepliesQuery } from '../../types';
+import {
+  useReplyListInReplyTableQuery,
+  useReplyListStatInReplyTableQuery,
+  ReplyListInReplyTableQuery,
+} from '../../types';
 
 type User = NonNullable<
-  ListRepliesQuery['ListReplies']
+  ReplyListInReplyTableQuery['ListReplies']
 >['edges'][number]['node']['user'];
 
 type CreatedAt = NonNullable<
-  ListRepliesQuery['ListReplies']
+  ReplyListInReplyTableQuery['ListReplies']
 >['edges'][number]['node']['createdAt'];
 
 const TextCell = styled('div')({
@@ -73,30 +77,48 @@ const COLUMNS: ColDef[] = [
 ];
 
 const ReplyTable: React.FC = () => {
-  const { data, loading, error } = useListRepliesQuery({
-    variables: {},
+  const [pageSize, setPageSize] = useState<number>(25);
+  const [loadedPageIdx, setLoadedPageIdx] = useState<number>(1);
+
+  const {
+    data: statData,
+    loading: statLoading,
+    error: statError,
+  } = useReplyListStatInReplyTableQuery();
+  const { data, loading, error, fetchMore } = useReplyListInReplyTableQuery({
+    variables: { pageSize },
   });
 
   if (error) {
     return <p>Error: {error}</p>;
   }
-  const rows = (data?.ListReplies?.edges || []).map(({ node }) => node);
+  if (statError) {
+    return <p>Error: {statError}</p>;
+  }
+
+  const edges = data?.ListReplies?.edges || [];
   return (
     <DataGrid
-      rows={rows}
+      rows={edges.map(({ node }) => node)}
       columns={COLUMNS}
       pagination
       autoHeight
       disableSelectionOnClick
-      pageSize={25}
+      pageSize={pageSize}
       rowHeight={64}
-      rowCount={data?.ListReplies?.totalCount || 0}
+      rowCount={statData?.ListReplies?.totalCount || 0}
       paginationMode="server"
       onPageChange={(params) => {
-        // eslint-disable-next-line no-console
-        console.info('p', params);
+        // Nothing is required when paginating between already loaded pages
+        if (params.page <= loadedPageIdx) return;
+
+        fetchMore({
+          variables: { after: edges[edges.length - 1].cursor, pageSize },
+        });
+        setLoadedPageIdx(params.page);
       }}
-      loading={loading}
+      onPageSizeChange={({ pageSize }) => setPageSize(pageSize)}
+      loading={loading || statLoading}
     />
   );
 };

@@ -871,13 +871,10 @@ export type BigNumOfFeedbacksQuery = (
   )> }
 );
 
-export type ListRepliesQueryVariables = Exact<{
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-}>;
+export type ReplyListStatInReplyTableQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ListRepliesQuery = (
+export type ReplyListStatInReplyTableQuery = (
   { readonly __typename?: 'Query' }
   & { readonly ListReplies?: Maybe<(
     { readonly __typename?: 'ReplyConnection' }
@@ -885,7 +882,21 @@ export type ListRepliesQuery = (
     & { readonly pageInfo: (
       { readonly __typename?: 'ReplyConnectionPageInfo' }
       & Pick<ReplyConnectionPageInfo, 'firstCursor' | 'lastCursor'>
-    ), readonly edges: ReadonlyArray<(
+    ) }
+  )> }
+);
+
+export type ReplyListInReplyTableQueryVariables = Exact<{
+  after?: Maybe<Scalars['String']>;
+  pageSize?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type ReplyListInReplyTableQuery = (
+  { readonly __typename?: 'Query' }
+  & { readonly ListReplies?: Maybe<(
+    { readonly __typename?: 'ReplyConnection' }
+    & { readonly edges: ReadonlyArray<(
       { readonly __typename?: 'ReplyConnectionEdge' }
       & Pick<ReplyConnectionEdge, 'cursor'>
       & { readonly node: (
@@ -1005,14 +1016,45 @@ export function useBigNumOfFeedbacksLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type BigNumOfFeedbacksQueryHookResult = ReturnType<typeof useBigNumOfFeedbacksQuery>;
 export type BigNumOfFeedbacksLazyQueryHookResult = ReturnType<typeof useBigNumOfFeedbacksLazyQuery>;
 export type BigNumOfFeedbacksQueryResult = Apollo.QueryResult<BigNumOfFeedbacksQuery, BigNumOfFeedbacksQueryVariables>;
-export const ListRepliesDocument = gql`
-    query ListReplies($before: String, $after: String) {
-  ListReplies(orderBy: [{createdAt: DESC}], before: $before, after: $after, first: 25) {
+export const ReplyListStatInReplyTableDocument = gql`
+    query ReplyListStatInReplyTable {
+  ListReplies {
     totalCount
     pageInfo {
       firstCursor
       lastCursor
     }
+  }
+}
+    `;
+
+/**
+ * __useReplyListStatInReplyTableQuery__
+ *
+ * To run a query within a React component, call `useReplyListStatInReplyTableQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReplyListStatInReplyTableQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReplyListStatInReplyTableQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useReplyListStatInReplyTableQuery(baseOptions?: Apollo.QueryHookOptions<ReplyListStatInReplyTableQuery, ReplyListStatInReplyTableQueryVariables>) {
+        return Apollo.useQuery<ReplyListStatInReplyTableQuery, ReplyListStatInReplyTableQueryVariables>(ReplyListStatInReplyTableDocument, baseOptions);
+      }
+export function useReplyListStatInReplyTableLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ReplyListStatInReplyTableQuery, ReplyListStatInReplyTableQueryVariables>) {
+          return Apollo.useLazyQuery<ReplyListStatInReplyTableQuery, ReplyListStatInReplyTableQueryVariables>(ReplyListStatInReplyTableDocument, baseOptions);
+        }
+export type ReplyListStatInReplyTableQueryHookResult = ReturnType<typeof useReplyListStatInReplyTableQuery>;
+export type ReplyListStatInReplyTableLazyQueryHookResult = ReturnType<typeof useReplyListStatInReplyTableLazyQuery>;
+export type ReplyListStatInReplyTableQueryResult = Apollo.QueryResult<ReplyListStatInReplyTableQuery, ReplyListStatInReplyTableQueryVariables>;
+export const ReplyListInReplyTableDocument = gql`
+    query ReplyListInReplyTable($after: String, $pageSize: Int) {
+  ListReplies(orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
     edges {
       cursor
       node {
@@ -1029,28 +1071,28 @@ export const ListRepliesDocument = gql`
     `;
 
 /**
- * __useListRepliesQuery__
+ * __useReplyListInReplyTableQuery__
  *
- * To run a query within a React component, call `useListRepliesQuery` and pass it any options that fit your needs.
- * When your component renders, `useListRepliesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useReplyListInReplyTableQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReplyListInReplyTableQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useListRepliesQuery({
+ * const { data, loading, error } = useReplyListInReplyTableQuery({
  *   variables: {
- *      before: // value for 'before'
  *      after: // value for 'after'
+ *      pageSize: // value for 'pageSize'
  *   },
  * });
  */
-export function useListRepliesQuery(baseOptions?: Apollo.QueryHookOptions<ListRepliesQuery, ListRepliesQueryVariables>) {
-        return Apollo.useQuery<ListRepliesQuery, ListRepliesQueryVariables>(ListRepliesDocument, baseOptions);
+export function useReplyListInReplyTableQuery(baseOptions?: Apollo.QueryHookOptions<ReplyListInReplyTableQuery, ReplyListInReplyTableQueryVariables>) {
+        return Apollo.useQuery<ReplyListInReplyTableQuery, ReplyListInReplyTableQueryVariables>(ReplyListInReplyTableDocument, baseOptions);
       }
-export function useListRepliesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ListRepliesQuery, ListRepliesQueryVariables>) {
-          return Apollo.useLazyQuery<ListRepliesQuery, ListRepliesQueryVariables>(ListRepliesDocument, baseOptions);
+export function useReplyListInReplyTableLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ReplyListInReplyTableQuery, ReplyListInReplyTableQueryVariables>) {
+          return Apollo.useLazyQuery<ReplyListInReplyTableQuery, ReplyListInReplyTableQueryVariables>(ReplyListInReplyTableDocument, baseOptions);
         }
-export type ListRepliesQueryHookResult = ReturnType<typeof useListRepliesQuery>;
-export type ListRepliesLazyQueryHookResult = ReturnType<typeof useListRepliesLazyQuery>;
-export type ListRepliesQueryResult = Apollo.QueryResult<ListRepliesQuery, ListRepliesQueryVariables>;
+export type ReplyListInReplyTableQueryHookResult = ReturnType<typeof useReplyListInReplyTableQuery>;
+export type ReplyListInReplyTableLazyQueryHookResult = ReturnType<typeof useReplyListInReplyTableLazyQuery>;
+export type ReplyListInReplyTableQueryResult = Apollo.QueryResult<ReplyListInReplyTableQuery, ReplyListInReplyTableQueryVariables>;
