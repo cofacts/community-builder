@@ -1,11 +1,11 @@
 import React from 'react';
 // import { useLocation } from 'react-router-dom';
 
-import ReplyTab from './ReplyTab';
+import ReplyTable from './ReplyTable';
 
 const EditorWorks: React.FC = () => {
-  // TODO: Tab, date filter, URL related items
-  return <ReplyTab />;
+  // TODO: Tab structure, date filter, URL related items
+  return <ReplyTable />;
 };
 
 export default EditorWorks;

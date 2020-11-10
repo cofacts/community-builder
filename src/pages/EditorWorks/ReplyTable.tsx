@@ -72,7 +72,7 @@ const COLUMNS: ColDef[] = [
   },
 ];
 
-const ReplyTab: React.FC = () => {
+const ReplyTable: React.FC = () => {
   const { data, loading, error } = useListRepliesQuery({
     variables: {},
   });
@@ -101,4 +101,4 @@ const ReplyTab: React.FC = () => {
   );
 };
 
-export default ReplyTab;
+export default ReplyTable;
