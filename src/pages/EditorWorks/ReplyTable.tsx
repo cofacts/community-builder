@@ -85,7 +85,13 @@ const ReplyTable: React.FC = () => {
     loading: statLoading,
     error: statError,
   } = useReplyListStatInReplyTableQuery();
-  const { data, loading, error, fetchMore } = useReplyListInReplyTableQuery({
+  const {
+    data,
+    loading,
+    error,
+    fetchMore,
+    refetch,
+  } = useReplyListInReplyTableQuery({
     variables: { pageSize },
   });
 
@@ -95,6 +101,27 @@ const ReplyTable: React.FC = () => {
   if (statError) {
     return <p>Error: {statError}</p>;
   }
+
+  const handlePageChange: React.ComponentProps<
+    typeof DataGrid
+  >['onPageChange'] = (params) => {
+    // Nothing is required when paginating between already loaded pages
+    if (params.page <= loadedPageIdx) return;
+
+    fetchMore({
+      variables: { after: edges[edges.length - 1].cursor, pageSize },
+    });
+    setLoadedPageIdx(params.page);
+  };
+
+  const handlePageSizeChange: React.ComponentProps<
+    typeof DataGrid
+  >['onPageSizeChange'] = (params) => {
+    setPageSize(params.pageSize);
+    refetch({ pageSize: params.pageSize });
+    // Reset page loading when page size is changed
+    setLoadedPageIdx(1);
+  };
 
   const edges = data?.ListReplies?.edges || [];
   return (
@@ -108,16 +135,8 @@ const ReplyTable: React.FC = () => {
       rowHeight={64}
       rowCount={statData?.ListReplies?.totalCount || 0}
       paginationMode="server"
-      onPageChange={(params) => {
-        // Nothing is required when paginating between already loaded pages
-        if (params.page <= loadedPageIdx) return;
-
-        fetchMore({
-          variables: { after: edges[edges.length - 1].cursor, pageSize },
-        });
-        setLoadedPageIdx(params.page);
-      }}
-      onPageSizeChange={({ pageSize }) => setPageSize(pageSize)}
+      onPageChange={handlePageChange}
+      onPageSizeChange={handlePageSizeChange}
       loading={loading || statLoading}
     />
   );
