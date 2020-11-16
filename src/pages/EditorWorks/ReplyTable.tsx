@@ -99,13 +99,7 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
   } = useReplyListStatInReplyTableQuery({
     variables: { createdAt: createdAtFilter },
   });
-  const {
-    data,
-    loading,
-    error,
-    fetchMore,
-    refetch,
-  } = useReplyListInReplyTableQuery({
+  const { data, loading, error, fetchMore } = useReplyListInReplyTableQuery({
     variables: {
       pageSize: PAGE_SIZE,
       createdAt: createdAtFilter,
@@ -131,21 +125,12 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     setLoadedPageIdx(params.page);
   };
 
-  const handlePageSizeChange: React.ComponentProps<
-    typeof DataGrid
-  >['onPageSizeChange'] = (params) => {
-    refetch();
-    // Reset page loading when page size is changed
-    setLoadedPageIdx(1);
-  };
-
   const edges = data?.ListReplies?.edges || [];
   return (
     <DataGrid
       rows={edges.map(({ node }) => node)}
       columns={COLUMNS}
       pagination
-      autoHeight
       disableSelectionOnClick
       pageSize={PAGE_SIZE}
       rowHeight={64}
@@ -153,7 +138,6 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
       paginationMode="server"
       rowsPerPageOptions={[]}
       onPageChange={handlePageChange}
-      onPageSizeChange={handlePageSizeChange}
       loading={loading || statLoading}
     />
   );
