@@ -76,16 +76,29 @@ const COLUMNS: ColDef[] = [
   },
 ];
 
+type Props = {
+  /** Elasticsearch supported time string */
+  startDate?: string;
+  /** Elasticsearch supported time string */
+  endDate?: string;
+};
+
 const PAGE_SIZE = 50;
 
-const ReplyTable: React.FC = () => {
+const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
   const [loadedPageIdx, setLoadedPageIdx] = useState<number>(1);
+  const createdAtFilter = {
+    GTE: startDate,
+    LTE: endDate,
+  };
 
   const {
     data: statData,
     loading: statLoading,
     error: statError,
-  } = useReplyListStatInReplyTableQuery();
+  } = useReplyListStatInReplyTableQuery({
+    variables: { createdAt: createdAtFilter },
+  });
   const {
     data,
     loading,
@@ -93,7 +106,10 @@ const ReplyTable: React.FC = () => {
     fetchMore,
     refetch,
   } = useReplyListInReplyTableQuery({
-    variables: { pageSize: PAGE_SIZE },
+    variables: {
+      pageSize: PAGE_SIZE,
+      createdAt: createdAtFilter,
+    },
   });
 
   if (error) {

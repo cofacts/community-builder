@@ -216,6 +216,11 @@ export type User = {
   readonly name?: Maybe<Scalars['String']>;
   /** return hash based on user email for gravatar url */
   readonly avatarUrl?: Maybe<Scalars['String']>;
+  readonly avatarData?: Maybe<Scalars['String']>;
+  /** Returns only for current user. Returns `null` otherwise. */
+  readonly appId?: Maybe<Scalars['String']>;
+  /** Returns only for current user. Returns `null` otherwise. */
+  readonly appUserId?: Maybe<Scalars['String']>;
   /** Returns only for current user. Returns `null` otherwise. */
   readonly facebookId?: Maybe<Scalars['String']>;
   /** Returns only for current user. Returns `null` otherwise. */
@@ -230,6 +235,7 @@ export type User = {
   readonly points: PointInfo;
   readonly createdAt?: Maybe<Scalars['String']>;
   readonly updatedAt?: Maybe<Scalars['String']>;
+  readonly lastActiveAt?: Maybe<Scalars['String']>;
 };
 
 /** Information of a user's point. Only available for current user. */
@@ -871,7 +877,9 @@ export type BigNumOfFeedbacksQuery = (
   )> }
 );
 
-export type ReplyListStatInReplyTableQueryVariables = Exact<{ [key: string]: never; }>;
+export type ReplyListStatInReplyTableQueryVariables = Exact<{
+  createdAt?: Maybe<TimeRangeInput>;
+}>;
 
 
 export type ReplyListStatInReplyTableQuery = (
@@ -889,6 +897,7 @@ export type ReplyListStatInReplyTableQuery = (
 export type ReplyListInReplyTableQueryVariables = Exact<{
   after?: Maybe<Scalars['String']>;
   pageSize?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<TimeRangeInput>;
 }>;
 
 
@@ -1017,8 +1026,8 @@ export type BigNumOfFeedbacksQueryHookResult = ReturnType<typeof useBigNumOfFeed
 export type BigNumOfFeedbacksLazyQueryHookResult = ReturnType<typeof useBigNumOfFeedbacksLazyQuery>;
 export type BigNumOfFeedbacksQueryResult = Apollo.QueryResult<BigNumOfFeedbacksQuery, BigNumOfFeedbacksQueryVariables>;
 export const ReplyListStatInReplyTableDocument = gql`
-    query ReplyListStatInReplyTable {
-  ListReplies {
+    query ReplyListStatInReplyTable($createdAt: TimeRangeInput) {
+  ListReplies(filter: {createdAt: $createdAt}) {
     totalCount
     pageInfo {
       firstCursor
@@ -1040,6 +1049,7 @@ export const ReplyListStatInReplyTableDocument = gql`
  * @example
  * const { data, loading, error } = useReplyListStatInReplyTableQuery({
  *   variables: {
+ *      createdAt: // value for 'createdAt'
  *   },
  * });
  */
@@ -1053,8 +1063,8 @@ export type ReplyListStatInReplyTableQueryHookResult = ReturnType<typeof useRepl
 export type ReplyListStatInReplyTableLazyQueryHookResult = ReturnType<typeof useReplyListStatInReplyTableLazyQuery>;
 export type ReplyListStatInReplyTableQueryResult = Apollo.QueryResult<ReplyListStatInReplyTableQuery, ReplyListStatInReplyTableQueryVariables>;
 export const ReplyListInReplyTableDocument = gql`
-    query ReplyListInReplyTable($after: String, $pageSize: Int) {
-  ListReplies(orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
+    query ReplyListInReplyTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput) {
+  ListReplies(filter: {createdAt: $createdAt}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
     edges {
       cursor
       node {
@@ -1084,6 +1094,7 @@ export const ReplyListInReplyTableDocument = gql`
  *   variables: {
  *      after: // value for 'after'
  *      pageSize: // value for 'pageSize'
+ *      createdAt: // value for 'createdAt'
  *   },
  * });
  */

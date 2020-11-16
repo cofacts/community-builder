@@ -4,8 +4,7 @@ import React from 'react';
 import ReplyTable from './ReplyTable';
 
 const EditorWorks: React.FC = () => {
-  // TODO: Tab structure, date filter, URL related items
-  return <ReplyTable />;
+  return <ReplyTable startDate="now-7d" />;
 };
 
 export default EditorWorks;

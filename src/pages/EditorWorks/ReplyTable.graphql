@@ -1,5 +1,7 @@
-query ReplyListStatInReplyTable {
-  ListReplies {
+query ReplyListStatInReplyTable($createdAt: TimeRangeInput) {
+  ListReplies(
+    filter: { createdAt: $createdAt }
+  ) {
     totalCount
     pageInfo {
       firstCursor
@@ -8,8 +10,9 @@ query ReplyListStatInReplyTable {
   }
 }
 
-query ReplyListInReplyTable($after: String, $pageSize: Int) {
+query ReplyListInReplyTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput) {
   ListReplies(
+    filter: { createdAt: $createdAt }
     orderBy: [{ createdAt: DESC }]
     after: $after
     first: $pageSize
