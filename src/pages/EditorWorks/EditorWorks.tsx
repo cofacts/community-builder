@@ -30,10 +30,7 @@ const EditorWorks: React.FC = () => {
         </CardContent>
       </Card>
       <Paper style={{ height: 700 }}>
-        <ReplyTable
-          startDate={`now-${day}d`}
-          key={/* Re-mount when day change */ day}
-        />
+        <ReplyTable startDate={`now-${day}d`} />
       </Paper>
     </>
   );

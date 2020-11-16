@@ -15,7 +15,7 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          ListReplies: relayStylePagination(),
+          ListReplies: relayStylePagination(['filter']),
         },
       },
     },
