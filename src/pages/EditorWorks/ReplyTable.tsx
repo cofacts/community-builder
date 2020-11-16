@@ -76,8 +76,9 @@ const COLUMNS: ColDef[] = [
   },
 ];
 
+const PAGE_SIZE = 50;
+
 const ReplyTable: React.FC = () => {
-  const [pageSize, setPageSize] = useState<number>(25);
   const [loadedPageIdx, setLoadedPageIdx] = useState<number>(1);
 
   const {
@@ -92,7 +93,7 @@ const ReplyTable: React.FC = () => {
     fetchMore,
     refetch,
   } = useReplyListInReplyTableQuery({
-    variables: { pageSize },
+    variables: { pageSize: PAGE_SIZE },
   });
 
   if (error) {
@@ -109,7 +110,7 @@ const ReplyTable: React.FC = () => {
     if (params.page <= loadedPageIdx) return;
 
     fetchMore({
-      variables: { after: edges[edges.length - 1].cursor, pageSize },
+      variables: { after: edges[edges.length - 1].cursor },
     });
     setLoadedPageIdx(params.page);
   };
@@ -117,8 +118,7 @@ const ReplyTable: React.FC = () => {
   const handlePageSizeChange: React.ComponentProps<
     typeof DataGrid
   >['onPageSizeChange'] = (params) => {
-    setPageSize(params.pageSize);
-    refetch({ pageSize: params.pageSize });
+    refetch();
     // Reset page loading when page size is changed
     setLoadedPageIdx(1);
   };
@@ -131,10 +131,11 @@ const ReplyTable: React.FC = () => {
       pagination
       autoHeight
       disableSelectionOnClick
-      pageSize={pageSize}
+      pageSize={PAGE_SIZE}
       rowHeight={64}
       rowCount={statData?.ListReplies?.totalCount || 0}
       paginationMode="server"
+      rowsPerPageOptions={[]}
       onPageChange={handlePageChange}
       onPageSizeChange={handlePageSizeChange}
       loading={loading || statLoading}
