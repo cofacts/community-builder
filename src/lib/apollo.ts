@@ -1,5 +1,6 @@
 import { ApolloClient, ApolloLink, InMemoryCache } from '@apollo/client';
 import { BatchHttpLink } from '@apollo/client/link/batch-http';
+import { relayStylePagination } from '@apollo/client/utilities';
 
 const client = new ApolloClient({
   link: ApolloLink.from([
@@ -10,7 +11,15 @@ const client = new ApolloClient({
       },
     }),
   ]),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          ListReplies: relayStylePagination(['filter']),
+        },
+      },
+    },
+  }),
 });
 
 export default client;
