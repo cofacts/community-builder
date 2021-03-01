@@ -8,6 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import ReplyTable from './ReplyTable';
 import FeedbackTable from './FeedbackTable';
+import ReplyRequestTable from './ReplyRequestTable';
 
 const useStyles = makeStyles((theme) => ({
   controls: {
@@ -60,6 +61,8 @@ const EditorWorks: React.FC = () => {
           <ReplyTable startDate={`now-${day}d`} />
         ) : workType === WorkType.ARTICLE_REPLY_FEEDBACK ? (
           <FeedbackTable startDate={`now-${day}d`} />
+        ) : workType === WorkType.REPLY_REQUEST ? (
+          <ReplyRequestTable startDate={`now-${day}d`} />
         ) : null}
       </Paper>
     </>
