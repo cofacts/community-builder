@@ -27,6 +27,7 @@ export type Query = {
   readonly ListReplies?: Maybe<ReplyConnection>;
   readonly ListCategories?: Maybe<ListCategoryConnection>;
   readonly ListArticleReplyFeedbacks?: Maybe<ListArticleReplyFeedbackConnection>;
+  readonly ListReplyRequests?: Maybe<ListReplyRequestConnection>;
 };
 
 
@@ -42,6 +43,7 @@ export type QueryGetReplyArgs = {
 
 export type QueryGetUserArgs = {
   id?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
 };
 
 
@@ -79,6 +81,15 @@ export type QueryListCategoriesArgs = {
 export type QueryListArticleReplyFeedbacksArgs = {
   filter?: Maybe<ListArticleReplyFeedbackFilter>;
   orderBy?: Maybe<ReadonlyArray<Maybe<ListArticleReplyFeedbackOrderBy>>>;
+  first?: Maybe<Scalars['Int']>;
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryListReplyRequestsArgs = {
+  filter?: Maybe<ListReplyRequestFilter>;
+  orderBy?: Maybe<ReadonlyArray<Maybe<ListReplyRequestOrderBy>>>;
   first?: Maybe<Scalars['Int']>;
   after?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
@@ -211,13 +222,18 @@ export type ReplySimilarRepliesArgs = {
 export type User = {
   readonly __typename?: 'User';
   readonly id?: Maybe<Scalars['String']>;
+  readonly slug?: Maybe<Scalars['String']>;
   /** Returns only for current user. Returns `null` otherwise. */
   readonly email?: Maybe<Scalars['String']>;
   readonly name?: Maybe<Scalars['String']>;
-  /** return hash based on user email for gravatar url */
+  readonly bio?: Maybe<Scalars['String']>;
+  /** returns avatar url from facebook, github or gravatar */
   readonly avatarUrl?: Maybe<Scalars['String']>;
+  /** return avatar data as JSON string, currently only used when avatarType is OpenPeeps */
   readonly avatarData?: Maybe<Scalars['String']>;
+  readonly avatarType?: Maybe<AvatarTypeEnum>;
   /** Returns only for current user. Returns `null` otherwise. */
+  readonly availableAvatarTypes?: Maybe<ReadonlyArray<Maybe<Scalars['String']>>>;
   readonly appId?: Maybe<Scalars['String']>;
   /** Returns only for current user. Returns `null` otherwise. */
   readonly appUserId?: Maybe<Scalars['String']>;
@@ -237,6 +253,13 @@ export type User = {
   readonly updatedAt?: Maybe<Scalars['String']>;
   readonly lastActiveAt?: Maybe<Scalars['String']>;
 };
+
+export enum AvatarTypeEnum {
+  OpenPeeps = 'OpenPeeps',
+  Gravatar = 'Gravatar',
+  Facebook = 'Facebook',
+  Github = 'Github'
+}
 
 /** Information of a user's point. Only available for current user. */
 export type PointInfo = {
@@ -465,11 +488,13 @@ export type ArticleCategoryFeedback = {
   readonly updatedAt?: Maybe<Scalars['String']>;
 };
 
-export type ReplyRequest = {
+export type ReplyRequest = Node & {
   readonly __typename?: 'ReplyRequest';
-  readonly id?: Maybe<Scalars['String']>;
+  readonly id: Scalars['ID'];
   readonly userId?: Maybe<Scalars['String']>;
   readonly appId?: Maybe<Scalars['String']>;
+  /** The author of reply request. */
+  readonly user?: Maybe<User>;
   readonly reason?: Maybe<Scalars['String']>;
   readonly feedbackCount?: Maybe<Scalars['Int']>;
   readonly positiveFeedbackCount?: Maybe<Scalars['Int']>;
@@ -702,6 +727,41 @@ export type ListArticleReplyFeedbackOrderBy = {
   readonly _score?: Maybe<SortOrderEnum>;
 };
 
+export type ListReplyRequestConnection = Connection & {
+  readonly __typename?: 'ListReplyRequestConnection';
+  /** The total count of the entire collection, regardless of "before", "after". */
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<ListReplyRequestConnectionEdge>;
+  readonly pageInfo: ListReplyRequestConnectionPageInfo;
+};
+
+export type ListReplyRequestConnectionEdge = Edge & {
+  readonly __typename?: 'ListReplyRequestConnectionEdge';
+  readonly node: ReplyRequest;
+  readonly cursor: Scalars['String'];
+  readonly score?: Maybe<Scalars['Float']>;
+  readonly highlight?: Maybe<Highlights>;
+};
+
+export type ListReplyRequestConnectionPageInfo = PageInfo & {
+  readonly __typename?: 'ListReplyRequestConnectionPageInfo';
+  readonly lastCursor?: Maybe<Scalars['String']>;
+  readonly firstCursor?: Maybe<Scalars['String']>;
+};
+
+export type ListReplyRequestFilter = {
+  readonly userId?: Maybe<Scalars['String']>;
+  readonly appId?: Maybe<Scalars['String']>;
+  readonly articleId?: Maybe<Scalars['String']>;
+  readonly createdAt?: Maybe<TimeRangeInput>;
+};
+
+/** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
+export type ListReplyRequestOrderBy = {
+  readonly createdAt?: Maybe<SortOrderEnum>;
+  readonly vote?: Maybe<SortOrderEnum>;
+};
+
 export type Mutation = {
   readonly __typename?: 'Mutation';
   /** Create an article and/or a replyRequest */
@@ -821,7 +881,11 @@ export type MutationUpdateArticleCategoryStatusArgs = {
 
 
 export type MutationUpdateUserArgs = {
-  name: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
+  avatarType?: Maybe<AvatarTypeEnum>;
+  avatarData?: Maybe<Scalars['String']>;
+  bio?: Maybe<Scalars['String']>;
 };
 
 export type MutationResult = {
@@ -877,6 +941,55 @@ export type BigNumOfFeedbacksQuery = (
   )> }
 );
 
+export type FeedbackListStatInFeedbackTableQueryVariables = Exact<{
+  createdAt?: Maybe<TimeRangeInput>;
+}>;
+
+
+export type FeedbackListStatInFeedbackTableQuery = (
+  { readonly __typename?: 'Query' }
+  & { readonly ListArticleReplyFeedbacks?: Maybe<(
+    { readonly __typename?: 'ListArticleReplyFeedbackConnection' }
+    & Pick<ListArticleReplyFeedbackConnection, 'totalCount'>
+    & { readonly pageInfo: (
+      { readonly __typename?: 'ListArticleReplyFeedbackConnectionPageInfo' }
+      & Pick<ListArticleReplyFeedbackConnectionPageInfo, 'firstCursor' | 'lastCursor'>
+    ) }
+  )> }
+);
+
+export type FeedbackListInFeedbackTableQueryVariables = Exact<{
+  after?: Maybe<Scalars['String']>;
+  pageSize?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<TimeRangeInput>;
+}>;
+
+
+export type FeedbackListInFeedbackTableQuery = (
+  { readonly __typename?: 'Query' }
+  & { readonly ListArticleReplyFeedbacks?: Maybe<(
+    { readonly __typename?: 'ListArticleReplyFeedbackConnection' }
+    & { readonly edges: ReadonlyArray<(
+      { readonly __typename?: 'ListArticleReplyFeedbackConnectionEdge' }
+      & Pick<ListArticleReplyFeedbackConnectionEdge, 'cursor'>
+      & { readonly node: (
+        { readonly __typename?: 'ArticleReplyFeedback' }
+        & Pick<ArticleReplyFeedback, 'id' | 'comment' | 'vote' | 'createdAt'>
+        & { readonly article?: Maybe<(
+          { readonly __typename?: 'Article' }
+          & Pick<Article, 'id' | 'text'>
+        )>, readonly reply?: Maybe<(
+          { readonly __typename?: 'Reply' }
+          & Pick<Reply, 'id' | 'text'>
+        )>, readonly user?: Maybe<(
+          { readonly __typename?: 'User' }
+          & Pick<User, 'id' | 'name'>
+        )> }
+      ) }
+    )> }
+  )> }
+);
+
 export type ReplyListStatInReplyTableQueryVariables = Exact<{
   createdAt?: Maybe<TimeRangeInput>;
 }>;
@@ -913,7 +1026,7 @@ export type ReplyListInReplyTableQuery = (
         & Pick<Reply, 'id' | 'text' | 'createdAt'>
         & { readonly user?: Maybe<(
           { readonly __typename?: 'User' }
-          & Pick<User, 'name'>
+          & Pick<User, 'id' | 'name'>
         )> }
       ) }
     )> }
@@ -1025,6 +1138,98 @@ export function useBigNumOfFeedbacksLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type BigNumOfFeedbacksQueryHookResult = ReturnType<typeof useBigNumOfFeedbacksQuery>;
 export type BigNumOfFeedbacksLazyQueryHookResult = ReturnType<typeof useBigNumOfFeedbacksLazyQuery>;
 export type BigNumOfFeedbacksQueryResult = Apollo.QueryResult<BigNumOfFeedbacksQuery, BigNumOfFeedbacksQueryVariables>;
+export const FeedbackListStatInFeedbackTableDocument = gql`
+    query FeedbackListStatInFeedbackTable($createdAt: TimeRangeInput) {
+  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt}) {
+    totalCount
+    pageInfo {
+      firstCursor
+      lastCursor
+    }
+  }
+}
+    `;
+
+/**
+ * __useFeedbackListStatInFeedbackTableQuery__
+ *
+ * To run a query within a React component, call `useFeedbackListStatInFeedbackTableQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFeedbackListStatInFeedbackTableQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFeedbackListStatInFeedbackTableQuery({
+ *   variables: {
+ *      createdAt: // value for 'createdAt'
+ *   },
+ * });
+ */
+export function useFeedbackListStatInFeedbackTableQuery(baseOptions?: Apollo.QueryHookOptions<FeedbackListStatInFeedbackTableQuery, FeedbackListStatInFeedbackTableQueryVariables>) {
+        return Apollo.useQuery<FeedbackListStatInFeedbackTableQuery, FeedbackListStatInFeedbackTableQueryVariables>(FeedbackListStatInFeedbackTableDocument, baseOptions);
+      }
+export function useFeedbackListStatInFeedbackTableLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FeedbackListStatInFeedbackTableQuery, FeedbackListStatInFeedbackTableQueryVariables>) {
+          return Apollo.useLazyQuery<FeedbackListStatInFeedbackTableQuery, FeedbackListStatInFeedbackTableQueryVariables>(FeedbackListStatInFeedbackTableDocument, baseOptions);
+        }
+export type FeedbackListStatInFeedbackTableQueryHookResult = ReturnType<typeof useFeedbackListStatInFeedbackTableQuery>;
+export type FeedbackListStatInFeedbackTableLazyQueryHookResult = ReturnType<typeof useFeedbackListStatInFeedbackTableLazyQuery>;
+export type FeedbackListStatInFeedbackTableQueryResult = Apollo.QueryResult<FeedbackListStatInFeedbackTableQuery, FeedbackListStatInFeedbackTableQueryVariables>;
+export const FeedbackListInFeedbackTableDocument = gql`
+    query FeedbackListInFeedbackTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput) {
+  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
+    edges {
+      cursor
+      node {
+        id
+        comment
+        vote
+        article {
+          id
+          text
+        }
+        reply {
+          id
+          text
+        }
+        user {
+          id
+          name
+        }
+        createdAt
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useFeedbackListInFeedbackTableQuery__
+ *
+ * To run a query within a React component, call `useFeedbackListInFeedbackTableQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFeedbackListInFeedbackTableQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFeedbackListInFeedbackTableQuery({
+ *   variables: {
+ *      after: // value for 'after'
+ *      pageSize: // value for 'pageSize'
+ *      createdAt: // value for 'createdAt'
+ *   },
+ * });
+ */
+export function useFeedbackListInFeedbackTableQuery(baseOptions?: Apollo.QueryHookOptions<FeedbackListInFeedbackTableQuery, FeedbackListInFeedbackTableQueryVariables>) {
+        return Apollo.useQuery<FeedbackListInFeedbackTableQuery, FeedbackListInFeedbackTableQueryVariables>(FeedbackListInFeedbackTableDocument, baseOptions);
+      }
+export function useFeedbackListInFeedbackTableLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FeedbackListInFeedbackTableQuery, FeedbackListInFeedbackTableQueryVariables>) {
+          return Apollo.useLazyQuery<FeedbackListInFeedbackTableQuery, FeedbackListInFeedbackTableQueryVariables>(FeedbackListInFeedbackTableDocument, baseOptions);
+        }
+export type FeedbackListInFeedbackTableQueryHookResult = ReturnType<typeof useFeedbackListInFeedbackTableQuery>;
+export type FeedbackListInFeedbackTableLazyQueryHookResult = ReturnType<typeof useFeedbackListInFeedbackTableLazyQuery>;
+export type FeedbackListInFeedbackTableQueryResult = Apollo.QueryResult<FeedbackListInFeedbackTableQuery, FeedbackListInFeedbackTableQueryVariables>;
 export const ReplyListStatInReplyTableDocument = gql`
     query ReplyListStatInReplyTable($createdAt: TimeRangeInput) {
   ListReplies(filter: {createdAt: $createdAt}) {
@@ -1071,6 +1276,7 @@ export const ReplyListInReplyTableDocument = gql`
         id
         text
         user {
+          id
           name
         }
         createdAt

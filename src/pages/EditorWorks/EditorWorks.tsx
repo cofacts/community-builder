@@ -7,6 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 
 import ReplyTable from './ReplyTable';
+import FeedbackTable from './FeedbackTable';
 
 const useStyles = makeStyles((theme) => ({
   controls: {
@@ -55,7 +56,11 @@ const EditorWorks: React.FC = () => {
         </CardContent>
       </Card>
       <Paper style={{ height: 700 }}>
-        <ReplyTable startDate={`now-${day}d`} />
+        {workType === WorkType.REPLY ? (
+          <ReplyTable startDate={`now-${day}d`} />
+        ) : workType === WorkType.ARTICLE_REPLY_FEEDBACK ? (
+          <FeedbackTable startDate={`now-${day}d`} />
+        ) : null}
       </Paper>
     </>
   );
