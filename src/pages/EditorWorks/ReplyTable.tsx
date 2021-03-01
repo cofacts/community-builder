@@ -36,7 +36,15 @@ const COLUMNS: ColDef[] = [
     renderCell: (params) => {
       const user = params.getValue('user') as User;
       if (!user) return <div />;
-      return <div>{user.name}</div>;
+      return (
+        <Link
+          href={`${process.env.REACT_APP_SITE_URL}/user?id=${user.id}`}
+          color="textPrimary"
+          variant="body2"
+        >
+          {user.name}
+        </Link>
+      );
     },
   },
   {
