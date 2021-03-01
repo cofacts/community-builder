@@ -1,20 +1,30 @@
 import React, { useState } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography';
 import { DataGrid, ColDef } from '@material-ui/data-grid';
 
 import {
-  useReplyListInReplyTableQuery,
-  useReplyListStatInReplyTableQuery,
-  ReplyListInReplyTableQuery,
+  useFeedbackListInFeedbackTableQuery,
+  useFeedbackListStatInFeedbackTableQuery,
+  FeedbackListInFeedbackTableQuery,
+  FeedbackVote,
 } from '../../types';
 
 type User = NonNullable<
-  ReplyListInReplyTableQuery['ListReplies']
+  FeedbackListInFeedbackTableQuery['ListArticleReplyFeedbacks']
 >['edges'][number]['node']['user'];
 
+type Article = NonNullable<
+  FeedbackListInFeedbackTableQuery['ListArticleReplyFeedbacks']
+>['edges'][number]['node']['article'];
+
+type Reply = NonNullable<
+  FeedbackListInFeedbackTableQuery['ListArticleReplyFeedbacks']
+>['edges'][number]['node']['reply'];
+
 type CreatedAt = NonNullable<
-  ReplyListInReplyTableQuery['ListReplies']
+  FeedbackListInFeedbackTableQuery['ListArticleReplyFeedbacks']
 >['edges'][number]['node']['createdAt'];
 
 const TextCell = styled('div')({
@@ -31,7 +41,7 @@ const COLUMNS: ColDef[] = [
   {
     field: 'author',
     headerName: 'Author',
-    width: 120,
+    width: 160,
     // eslint-disable-next-line react/display-name
     renderCell: (params) => {
       const user = params.getValue('user') as User;
@@ -48,24 +58,59 @@ const COLUMNS: ColDef[] = [
     },
   },
   {
-    field: 'text',
-    headerName: 'Text',
+    field: 'vote',
+    headerName: 'Vote',
+    width: 48,
+    valueGetter: (params) => {
+      switch (params.getValue('vote')) {
+        case FeedbackVote.Upvote:
+          return '👍';
+        case FeedbackVote.Downvote:
+          return '👎';
+        default:
+          return '--';
+      }
+    },
+  },
+  {
+    field: 'comment',
+    headerName: 'Comment',
+    width: 300,
+    // eslint-disable-next-line react/display-name
+    renderCell: (params) => {
+      const comment = params.getValue('comment');
+      return <TextCell>{comment}</TextCell>;
+    },
+  },
+  {
+    field: 'target',
+    headerName: 'Article & Reply',
     width: 480,
     // eslint-disable-next-line react/display-name
     renderCell: (params) => {
-      const text = params.getValue('text');
-      const replyId = params.getValue('id');
-      if (!replyId || !text) return <div />;
+      const article = params.getValue('article') as Article;
+      const reply = params.getValue('reply') as Reply;
       return (
-        <TextCell>
-          <Link
-            href={`${process.env.REACT_APP_SITE_URL}/reply/${replyId}`}
-            color="textPrimary"
-            variant="body2"
-          >
-            {text}
-          </Link>
-        </TextCell>
+        <div>
+          {article && (
+            <Link
+              href={`${process.env.REACT_APP_SITE_URL}/article/${article.id}`}
+              color="textPrimary"
+              variant="body2"
+            >
+              <Typography variant="body2">{article.text || ''}</Typography>
+            </Link>
+          )}
+          {reply && (
+            <Link
+              href={`${process.env.REACT_APP_SITE_URL}/reply/${reply.id}`}
+              color="textPrimary"
+              variant="body2"
+            >
+              <Typography variant="body2">{reply.text || ''}</Typography>
+            </Link>
+          )}
+        </div>
       );
     },
   },
@@ -104,10 +149,15 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     data: statData,
     loading: statLoading,
     error: statError,
-  } = useReplyListStatInReplyTableQuery({
+  } = useFeedbackListStatInFeedbackTableQuery({
     variables: { createdAt: createdAtFilter },
   });
-  const { data, loading, error, fetchMore } = useReplyListInReplyTableQuery({
+  const {
+    data,
+    loading,
+    error,
+    fetchMore,
+  } = useFeedbackListInFeedbackTableQuery({
     variables: {
       pageSize: PAGE_SIZE,
       createdAt: createdAtFilter,
@@ -133,7 +183,7 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     setLoadedPageIdx(params.page);
   };
 
-  const edges = data?.ListReplies?.edges || [];
+  const edges = data?.ListArticleReplyFeedbacks?.edges || [];
   return (
     <DataGrid
       rows={edges.map(({ node }) => node)}
@@ -142,7 +192,7 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
       disableSelectionOnClick
       pageSize={PAGE_SIZE}
       rowHeight={64}
-      rowCount={statData?.ListReplies?.totalCount || 0}
+      rowCount={statData?.ListArticleReplyFeedbacks?.totalCount || 0}
       paginationMode="server"
       rowsPerPageOptions={[]}
       onPageChange={handlePageChange}

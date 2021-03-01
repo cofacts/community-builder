@@ -1,5 +1,5 @@
-query ReplyListStatInReplyTable($createdAt: TimeRangeInput) {
-  ListReplies(
+query FeedbackListStatInFeedbackTable($createdAt: TimeRangeInput) {
+  ListArticleReplyFeedbacks(
     filter: { createdAt: $createdAt }
   ) {
     totalCount
@@ -10,8 +10,8 @@ query ReplyListStatInReplyTable($createdAt: TimeRangeInput) {
   }
 }
 
-query ReplyListInReplyTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput) {
-  ListReplies(
+query FeedbackListInFeedbackTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput) {
+  ListArticleReplyFeedbacks(
     filter: { createdAt: $createdAt }
     orderBy: [{ createdAt: DESC }]
     after: $after
@@ -21,7 +21,16 @@ query ReplyListInReplyTable($after: String, $pageSize: Int, $createdAt: TimeRang
       cursor
       node {
         id
-        text
+        comment
+        vote
+        article {
+          id
+          text
+        }
+        reply {
+          id
+          text
+        }
         user {
           id
           name
