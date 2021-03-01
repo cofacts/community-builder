@@ -1,0 +1,33 @@
+query ReplyRequestListStatInReplyRequestTable($createdAt: TimeRangeInput) {
+  ListReplyRequests(
+    filter: { createdAt: $createdAt }
+  ) {
+    totalCount
+    pageInfo {
+      firstCursor
+      lastCursor
+    }
+  }
+}
+
+query ReplyRequestListInReplyRequestTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput) {
+  ListReplyRequests(
+    filter: { createdAt: $createdAt }
+    orderBy: [{ createdAt: DESC }]
+    after: $after
+    first: $pageSize
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        reason
+        updatedAt
+        user {
+          id
+          name
+        }
+      }
+    }
+  }
+}

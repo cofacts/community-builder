@@ -990,6 +990,49 @@ export type FeedbackListInFeedbackTableQuery = (
   )> }
 );
 
+export type ReplyRequestListStatInReplyRequestTableQueryVariables = Exact<{
+  createdAt?: Maybe<TimeRangeInput>;
+}>;
+
+
+export type ReplyRequestListStatInReplyRequestTableQuery = (
+  { readonly __typename?: 'Query' }
+  & { readonly ListReplyRequests?: Maybe<(
+    { readonly __typename?: 'ListReplyRequestConnection' }
+    & Pick<ListReplyRequestConnection, 'totalCount'>
+    & { readonly pageInfo: (
+      { readonly __typename?: 'ListReplyRequestConnectionPageInfo' }
+      & Pick<ListReplyRequestConnectionPageInfo, 'firstCursor' | 'lastCursor'>
+    ) }
+  )> }
+);
+
+export type ReplyRequestListInReplyRequestTableQueryVariables = Exact<{
+  after?: Maybe<Scalars['String']>;
+  pageSize?: Maybe<Scalars['Int']>;
+  createdAt?: Maybe<TimeRangeInput>;
+}>;
+
+
+export type ReplyRequestListInReplyRequestTableQuery = (
+  { readonly __typename?: 'Query' }
+  & { readonly ListReplyRequests?: Maybe<(
+    { readonly __typename?: 'ListReplyRequestConnection' }
+    & { readonly edges: ReadonlyArray<(
+      { readonly __typename?: 'ListReplyRequestConnectionEdge' }
+      & Pick<ListReplyRequestConnectionEdge, 'cursor'>
+      & { readonly node: (
+        { readonly __typename?: 'ReplyRequest' }
+        & Pick<ReplyRequest, 'id' | 'reason' | 'updatedAt'>
+        & { readonly user?: Maybe<(
+          { readonly __typename?: 'User' }
+          & Pick<User, 'id' | 'name'>
+        )> }
+      ) }
+    )> }
+  )> }
+);
+
 export type ReplyListStatInReplyTableQueryVariables = Exact<{
   createdAt?: Maybe<TimeRangeInput>;
 }>;
@@ -1230,6 +1273,89 @@ export function useFeedbackListInFeedbackTableLazyQuery(baseOptions?: Apollo.Laz
 export type FeedbackListInFeedbackTableQueryHookResult = ReturnType<typeof useFeedbackListInFeedbackTableQuery>;
 export type FeedbackListInFeedbackTableLazyQueryHookResult = ReturnType<typeof useFeedbackListInFeedbackTableLazyQuery>;
 export type FeedbackListInFeedbackTableQueryResult = Apollo.QueryResult<FeedbackListInFeedbackTableQuery, FeedbackListInFeedbackTableQueryVariables>;
+export const ReplyRequestListStatInReplyRequestTableDocument = gql`
+    query ReplyRequestListStatInReplyRequestTable($createdAt: TimeRangeInput) {
+  ListReplyRequests(filter: {createdAt: $createdAt}) {
+    totalCount
+    pageInfo {
+      firstCursor
+      lastCursor
+    }
+  }
+}
+    `;
+
+/**
+ * __useReplyRequestListStatInReplyRequestTableQuery__
+ *
+ * To run a query within a React component, call `useReplyRequestListStatInReplyRequestTableQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReplyRequestListStatInReplyRequestTableQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReplyRequestListStatInReplyRequestTableQuery({
+ *   variables: {
+ *      createdAt: // value for 'createdAt'
+ *   },
+ * });
+ */
+export function useReplyRequestListStatInReplyRequestTableQuery(baseOptions?: Apollo.QueryHookOptions<ReplyRequestListStatInReplyRequestTableQuery, ReplyRequestListStatInReplyRequestTableQueryVariables>) {
+        return Apollo.useQuery<ReplyRequestListStatInReplyRequestTableQuery, ReplyRequestListStatInReplyRequestTableQueryVariables>(ReplyRequestListStatInReplyRequestTableDocument, baseOptions);
+      }
+export function useReplyRequestListStatInReplyRequestTableLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ReplyRequestListStatInReplyRequestTableQuery, ReplyRequestListStatInReplyRequestTableQueryVariables>) {
+          return Apollo.useLazyQuery<ReplyRequestListStatInReplyRequestTableQuery, ReplyRequestListStatInReplyRequestTableQueryVariables>(ReplyRequestListStatInReplyRequestTableDocument, baseOptions);
+        }
+export type ReplyRequestListStatInReplyRequestTableQueryHookResult = ReturnType<typeof useReplyRequestListStatInReplyRequestTableQuery>;
+export type ReplyRequestListStatInReplyRequestTableLazyQueryHookResult = ReturnType<typeof useReplyRequestListStatInReplyRequestTableLazyQuery>;
+export type ReplyRequestListStatInReplyRequestTableQueryResult = Apollo.QueryResult<ReplyRequestListStatInReplyRequestTableQuery, ReplyRequestListStatInReplyRequestTableQueryVariables>;
+export const ReplyRequestListInReplyRequestTableDocument = gql`
+    query ReplyRequestListInReplyRequestTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput) {
+  ListReplyRequests(filter: {createdAt: $createdAt}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
+    edges {
+      cursor
+      node {
+        id
+        reason
+        updatedAt
+        user {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useReplyRequestListInReplyRequestTableQuery__
+ *
+ * To run a query within a React component, call `useReplyRequestListInReplyRequestTableQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReplyRequestListInReplyRequestTableQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReplyRequestListInReplyRequestTableQuery({
+ *   variables: {
+ *      after: // value for 'after'
+ *      pageSize: // value for 'pageSize'
+ *      createdAt: // value for 'createdAt'
+ *   },
+ * });
+ */
+export function useReplyRequestListInReplyRequestTableQuery(baseOptions?: Apollo.QueryHookOptions<ReplyRequestListInReplyRequestTableQuery, ReplyRequestListInReplyRequestTableQueryVariables>) {
+        return Apollo.useQuery<ReplyRequestListInReplyRequestTableQuery, ReplyRequestListInReplyRequestTableQueryVariables>(ReplyRequestListInReplyRequestTableDocument, baseOptions);
+      }
+export function useReplyRequestListInReplyRequestTableLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ReplyRequestListInReplyRequestTableQuery, ReplyRequestListInReplyRequestTableQueryVariables>) {
+          return Apollo.useLazyQuery<ReplyRequestListInReplyRequestTableQuery, ReplyRequestListInReplyRequestTableQueryVariables>(ReplyRequestListInReplyRequestTableDocument, baseOptions);
+        }
+export type ReplyRequestListInReplyRequestTableQueryHookResult = ReturnType<typeof useReplyRequestListInReplyRequestTableQuery>;
+export type ReplyRequestListInReplyRequestTableLazyQueryHookResult = ReturnType<typeof useReplyRequestListInReplyRequestTableLazyQuery>;
+export type ReplyRequestListInReplyRequestTableQueryResult = Apollo.QueryResult<ReplyRequestListInReplyRequestTableQuery, ReplyRequestListInReplyRequestTableQueryVariables>;
 export const ReplyListStatInReplyTableDocument = gql`
     query ReplyListStatInReplyTable($createdAt: TimeRangeInput) {
   ListReplies(filter: {createdAt: $createdAt}) {
