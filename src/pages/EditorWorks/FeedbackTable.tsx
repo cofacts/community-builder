@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { styled } from '@material-ui/core/styles';
-// import Link from '@material-ui/core/Link';
+import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography';
 import { DataGrid, ColDef } from '@material-ui/data-grid';
 
 import {
@@ -13,6 +14,14 @@ import {
 type User = NonNullable<
   FeedbackListInFeedbackTableQuery['ListArticleReplyFeedbacks']
 >['edges'][number]['node']['user'];
+
+type Article = NonNullable<
+  FeedbackListInFeedbackTableQuery['ListArticleReplyFeedbacks']
+>['edges'][number]['node']['article'];
+
+type Reply = NonNullable<
+  FeedbackListInFeedbackTableQuery['ListArticleReplyFeedbacks']
+>['edges'][number]['node']['reply'];
 
 type CreatedAt = NonNullable<
   FeedbackListInFeedbackTableQuery['ListArticleReplyFeedbacks']
@@ -58,11 +67,43 @@ const COLUMNS: ColDef[] = [
   {
     field: 'comment',
     headerName: 'Comment',
-    width: 480,
+    width: 300,
     // eslint-disable-next-line react/display-name
     renderCell: (params) => {
       const comment = params.getValue('comment');
       return <TextCell>{comment}</TextCell>;
+    },
+  },
+  {
+    field: 'target',
+    headerName: 'Article & Reply',
+    width: 480,
+    // eslint-disable-next-line react/display-name
+    renderCell: (params) => {
+      const article = params.getValue('article') as Article;
+      const reply = params.getValue('reply') as Reply;
+      return (
+        <div>
+          {article && (
+            <Link
+              href={`${process.env.REACT_APP_SITE_URL}/article/${article.id}`}
+              color="textPrimary"
+              variant="body2"
+            >
+              <Typography variant="body2">{article.text || ''}</Typography>
+            </Link>
+          )}
+          {reply && (
+            <Link
+              href={`${process.env.REACT_APP_SITE_URL}/reply/${reply.id}`}
+              color="textPrimary"
+              variant="body2"
+            >
+              <Typography variant="body2">{reply.text || ''}</Typography>
+            </Link>
+          )}
+        </div>
+      );
     },
   },
   {
