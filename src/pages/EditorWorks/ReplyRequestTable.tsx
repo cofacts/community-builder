@@ -101,6 +101,7 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     error,
     fetchMore,
   } = useReplyRequestListInReplyRequestTableQuery({
+    notifyOnNetworkStatusChange: true,
     variables: {
       pageSize: PAGE_SIZE,
       createdAt: createdAtFilter,
@@ -127,6 +128,7 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
   };
 
   const edges = data?.ListReplyRequests?.edges || [];
+  const isLoading = loading || statLoading;
   return (
     <DataGrid
       rows={edges.map(({ node }) => node)}
@@ -139,7 +141,8 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
       paginationMode="server"
       rowsPerPageOptions={[]}
       onPageChange={handlePageChange}
-      loading={loading || statLoading}
+      loading={isLoading}
+      hideFooterPagination={isLoading}
     />
   );
 };
