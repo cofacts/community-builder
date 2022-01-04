@@ -1,7 +1,7 @@
 Cofacts Community Builder
 =======
 
-[![Build Status](https://travis-ci.org/cofacts/community-builder.svg?branch=master)](https://travis-ci.org/cofacts/community-builder)
+[![CI test](https://github.com/cofacts/community-builder/actions/workflows/ci.yml/badge.svg)](https://github.com/cofacts/community-builder/actions/workflows/ci.yml)
 
 Tools that help community building.
 
