@@ -28,6 +28,8 @@ export type Query = {
   readonly ListCategories?: Maybe<ListCategoryConnection>;
   readonly ListArticleReplyFeedbacks?: Maybe<ListArticleReplyFeedbackConnection>;
   readonly ListReplyRequests?: Maybe<ListReplyRequestConnection>;
+  readonly ListBlockedUsers: UserConnection;
+  readonly ValidateSlug?: Maybe<ValidationResult>;
 };
 
 
@@ -95,6 +97,20 @@ export type QueryListReplyRequestsArgs = {
   before?: Maybe<Scalars['String']>;
 };
 
+
+export type QueryListBlockedUsersArgs = {
+  filter?: Maybe<ListBlockedUsersFilter>;
+  orderBy?: Maybe<ReadonlyArray<Maybe<ListBlockedUsersOrderBy>>>;
+  first?: Maybe<Scalars['Int']>;
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryValidateSlugArgs = {
+  slug: Scalars['String'];
+};
+
 export type Article = Node & {
   readonly __typename?: 'Article';
   readonly id: Scalars['ID'];
@@ -126,11 +142,18 @@ export type Article = Node & {
 
 export type ArticleArticleRepliesArgs = {
   status?: Maybe<ArticleReplyStatusEnum>;
+  statuses?: Maybe<ReadonlyArray<ArticleReplyStatusEnum>>;
 };
 
 
 export type ArticleArticleCategoriesArgs = {
   status?: Maybe<ArticleCategoryStatusEnum>;
+  statuses?: Maybe<ReadonlyArray<ArticleCategoryStatusEnum>>;
+};
+
+
+export type ArticleReplyRequestsArgs = {
+  statuses?: Maybe<ReadonlyArray<ReplyRequestStatusEnum>>;
 };
 
 
@@ -178,6 +201,8 @@ export type ArticleReply = {
   readonly article?: Maybe<Article>;
   /** The user who conencted this reply and this article. */
   readonly user?: Maybe<User>;
+  readonly userId: Scalars['String'];
+  readonly appId: Scalars['String'];
   readonly canUpdateStatus?: Maybe<Scalars['Boolean']>;
   readonly feedbackCount?: Maybe<Scalars['Int']>;
   readonly positiveFeedbackCount?: Maybe<Scalars['Int']>;
@@ -188,6 +213,12 @@ export type ArticleReply = {
   readonly status?: Maybe<ArticleReplyStatusEnum>;
   readonly createdAt?: Maybe<Scalars['String']>;
   readonly updatedAt?: Maybe<Scalars['String']>;
+};
+
+
+/** The linkage between an Article and a Reply */
+export type ArticleReplyFeedbacksArgs = {
+  statuses?: Maybe<ReadonlyArray<ArticleReplyFeedbackStatusEnum>>;
 };
 
 export type Reply = Node & {
@@ -209,6 +240,7 @@ export type Reply = Node & {
 
 export type ReplyArticleRepliesArgs = {
   status?: Maybe<ArticleReplyStatusEnum>;
+  statuses?: Maybe<ReadonlyArray<ArticleReplyStatusEnum>>;
 };
 
 
@@ -219,9 +251,9 @@ export type ReplySimilarRepliesArgs = {
   before?: Maybe<Scalars['String']>;
 };
 
-export type User = {
+export type User = Node & {
   readonly __typename?: 'User';
-  readonly id?: Maybe<Scalars['String']>;
+  readonly id: Scalars['ID'];
   readonly slug?: Maybe<Scalars['String']>;
   /** Returns only for current user. Returns `null` otherwise. */
   readonly email?: Maybe<Scalars['String']>;
@@ -252,6 +284,15 @@ export type User = {
   readonly createdAt?: Maybe<Scalars['String']>;
   readonly updatedAt?: Maybe<Scalars['String']>;
   readonly lastActiveAt?: Maybe<Scalars['String']>;
+  /** List of contributions made by the user */
+  readonly contributions?: Maybe<ReadonlyArray<Maybe<Contribution>>>;
+  /** If not null, the user is blocked with the announcement in this string. */
+  readonly blockedReason?: Maybe<Scalars['String']>;
+};
+
+
+export type UserContributionsArgs = {
+  dateRange?: Maybe<TimeRangeInput>;
 };
 
 export enum AvatarTypeEnum {
@@ -272,6 +313,21 @@ export type PointInfo = {
   readonly nextLevel: Scalars['Int'];
 };
 
+export type Contribution = {
+  readonly __typename?: 'Contribution';
+  readonly date?: Maybe<Scalars['String']>;
+  readonly count?: Maybe<Scalars['Int']>;
+};
+
+/** List only the entries that were created between the specific time range. The time range value is in elasticsearch date format (https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html) */
+export type TimeRangeInput = {
+  readonly LT?: Maybe<Scalars['String']>;
+  readonly LTE?: Maybe<Scalars['String']>;
+  readonly GT?: Maybe<Scalars['String']>;
+  readonly GTE?: Maybe<Scalars['String']>;
+  readonly EQ?: Maybe<Scalars['String']>;
+};
+
 /** Reflects how the replier categories the replied article. */
 export enum ReplyTypeEnum {
   /** The replier thinks that the article contains false information. */
@@ -286,7 +342,9 @@ export enum ReplyTypeEnum {
 
 export enum ArticleReplyStatusEnum {
   Normal = 'NORMAL',
-  Deleted = 'DELETED'
+  Deleted = 'DELETED',
+  /** Created by a blocked user violating terms of use. */
+  Blocked = 'BLOCKED'
 }
 
 /** Data behind a hyperlink */
@@ -378,6 +436,7 @@ export type ArticleReplyFeedback = Node & {
   readonly comment?: Maybe<Scalars['String']>;
   readonly createdAt?: Maybe<Scalars['String']>;
   readonly updatedAt?: Maybe<Scalars['String']>;
+  readonly status: ArticleReplyFeedbackStatusEnum;
   /** User's vote on the articleReply */
   readonly vote?: Maybe<FeedbackVote>;
   /**
@@ -392,6 +451,12 @@ export type ArticleReplyFeedback = Node & {
   /** The scored article-reply */
   readonly articleReply?: Maybe<ArticleReply>;
 };
+
+export enum ArticleReplyFeedbackStatusEnum {
+  Normal = 'NORMAL',
+  /** Created by a blocked user violating terms of use. */
+  Blocked = 'BLOCKED'
+}
 
 export enum FeedbackVote {
   Upvote = 'UPVOTE',
@@ -409,6 +474,8 @@ export type ArticleCategory = Node & {
   readonly article?: Maybe<Article>;
   /** The user who updated this category with this article. */
   readonly user?: Maybe<User>;
+  readonly userId: Scalars['String'];
+  readonly appId: Scalars['String'];
   readonly canUpdateStatus?: Maybe<Scalars['Boolean']>;
   readonly feedbackCount?: Maybe<Scalars['Int']>;
   readonly positiveFeedbackCount?: Maybe<Scalars['Int']>;
@@ -468,7 +535,9 @@ export type ArticleCategoryConnectionPageInfo = PageInfo & {
 
 export enum ArticleCategoryStatusEnum {
   Normal = 'NORMAL',
-  Deleted = 'DELETED'
+  Deleted = 'DELETED',
+  /** Created by a blocked user violating terms of use. */
+  Blocked = 'BLOCKED'
 }
 
 /** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
@@ -491,6 +560,7 @@ export type ArticleCategoryFeedback = {
 export type ReplyRequest = Node & {
   readonly __typename?: 'ReplyRequest';
   readonly id: Scalars['ID'];
+  readonly articleId: Scalars['ID'];
   readonly userId?: Maybe<Scalars['String']>;
   readonly appId?: Maybe<Scalars['String']>;
   /** The author of reply request. */
@@ -503,7 +573,15 @@ export type ReplyRequest = Node & {
   readonly updatedAt?: Maybe<Scalars['String']>;
   /** The feedback of current user. null when not logged in or not voted yet. */
   readonly ownVote?: Maybe<FeedbackVote>;
+  readonly article: Article;
+  readonly status: ReplyRequestStatusEnum;
 };
+
+export enum ReplyRequestStatusEnum {
+  Normal = 'NORMAL',
+  /** Created by a blocked user violating terms of use. */
+  Blocked = 'BLOCKED'
+}
 
 export type ArticleConnection = Connection & {
   readonly __typename?: 'ArticleConnection';
@@ -553,15 +631,6 @@ export type Analytics = {
   readonly lineVisit?: Maybe<Scalars['Int']>;
   readonly webUser?: Maybe<Scalars['Int']>;
   readonly webVisit?: Maybe<Scalars['Int']>;
-};
-
-/** List only the entries that were created between the specific time range. The time range value is in elasticsearch date format (https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html) */
-export type TimeRangeInput = {
-  readonly LT?: Maybe<Scalars['String']>;
-  readonly LTE?: Maybe<Scalars['String']>;
-  readonly GT?: Maybe<Scalars['String']>;
-  readonly GTE?: Maybe<Scalars['String']>;
-  readonly EQ?: Maybe<Scalars['String']>;
 };
 
 export type ListArticleFilter = {
@@ -716,6 +785,8 @@ export type ListArticleReplyFeedbackFilter = {
   readonly createdAt?: Maybe<TimeRangeInput>;
   /** List only the article reply feedbacks that were last updated within the specific time range. */
   readonly updatedAt?: Maybe<TimeRangeInput>;
+  /** List only the article reply feedbacks with the selected statuses */
+  readonly statuses?: Maybe<ReadonlyArray<ArticleReplyFeedbackStatusEnum>>;
 };
 
 /** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
@@ -754,6 +825,8 @@ export type ListReplyRequestFilter = {
   readonly appId?: Maybe<Scalars['String']>;
   readonly articleId?: Maybe<Scalars['String']>;
   readonly createdAt?: Maybe<TimeRangeInput>;
+  /** List only reply requests with specified statuses */
+  readonly statuses?: Maybe<ReadonlyArray<ReplyRequestStatusEnum>>;
 };
 
 /** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
@@ -761,6 +834,56 @@ export type ListReplyRequestOrderBy = {
   readonly createdAt?: Maybe<SortOrderEnum>;
   readonly vote?: Maybe<SortOrderEnum>;
 };
+
+export type UserConnection = Connection & {
+  readonly __typename?: 'UserConnection';
+  /** The total count of the entire collection, regardless of "before", "after". */
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<UserConnectionEdge>;
+  readonly pageInfo: UserConnectionPageInfo;
+};
+
+export type UserConnectionEdge = Edge & {
+  readonly __typename?: 'UserConnectionEdge';
+  readonly node: User;
+  readonly cursor: Scalars['String'];
+  readonly score?: Maybe<Scalars['Float']>;
+  readonly highlight?: Maybe<Highlights>;
+};
+
+export type UserConnectionPageInfo = PageInfo & {
+  readonly __typename?: 'UserConnectionPageInfo';
+  readonly lastCursor?: Maybe<Scalars['String']>;
+  readonly firstCursor?: Maybe<Scalars['String']>;
+};
+
+export type ListBlockedUsersFilter = {
+  /** List only the blocked users that were registered between the specific time range. */
+  readonly createdAt?: Maybe<TimeRangeInput>;
+};
+
+/** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
+export type ListBlockedUsersOrderBy = {
+  readonly createdAt?: Maybe<SortOrderEnum>;
+};
+
+export type ValidationResult = {
+  readonly __typename?: 'ValidationResult';
+  readonly success: Scalars['Boolean'];
+  readonly error?: Maybe<SlugErrorEnum>;
+};
+
+/** Slug of canot */
+export enum SlugErrorEnum {
+  /** Slug is empty */
+  Empty = 'EMPTY',
+  /** Slug have leading or trailing spaces or line ends */
+  NotTrimmed = 'NOT_TRIMMED',
+  /** Slug has URI component inside, which can be misleading to browsers */
+  HasUriComponent = 'HAS_URI_COMPONENT',
+  /** Slug has already been taken by someone else */
+  Taken = 'TAKEN'
+}
 
 export type Mutation = {
   readonly __typename?: 'Mutation';
