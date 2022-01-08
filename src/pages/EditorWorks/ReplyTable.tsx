@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { styled } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import DataTable, { PAGE_SIZE } from '../../components/DataTable';
+import { GridColDef } from '@mui/x-data-grid';
 
 import {
   useReplyListInReplyTableQuery,
@@ -89,10 +90,7 @@ type Props = {
   endDate?: string;
 };
 
-const PAGE_SIZE = 50;
-
 const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
-  const [page, setPage] = useState<number>(0);
   const createdAtFilter = {
     GTE: startDate,
     LTE: endDate,
@@ -114,10 +112,6 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
   });
 
   const edges = data?.ListReplies?.edges || [];
-  // Determine already loaded page idx according to data already in cache
-  const [loadedPageIdx, setLoadedPageIdx] = useState<number>(
-    () => Math.floor(edges.length / PAGE_SIZE) - 1
-  );
 
   if (error) {
     return <p>Error: {error}</p>;
@@ -126,36 +120,18 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     return <p>Error: {statError}</p>;
   }
 
-  const handlePageChange: React.ComponentProps<
-    typeof DataGrid
-  >['onPageChange'] = (page) => {
-    setPage(page);
-
-    // Nothing is required when paginating between already loaded pages
-    if (page <= loadedPageIdx) return;
-
-    fetchMore({
-      variables: { after: edges[edges.length - 1].cursor },
-    });
-    setLoadedPageIdx(page);
-  };
-
-  const isLoading = loading || statLoading;
   return (
-    <DataGrid
-      rows={edges.slice(page * PAGE_SIZE).map(({ node }) => node)}
+    <DataTable
+      currentlyLoadedRows={edges.map(({ node }) => node)}
       columns={COLUMNS}
-      pagination
-      disableSelectionOnClick
-      page={page}
-      pageSize={PAGE_SIZE}
       rowHeight={64}
       rowCount={statData?.ListReplies?.totalCount || 0}
-      paginationMode="server"
-      rowsPerPageOptions={[PAGE_SIZE]}
-      onPageChange={handlePageChange}
-      loading={isLoading}
-      hideFooterPagination={isLoading}
+      onNewPageRequest={() =>
+        fetchMore({
+          variables: { after: edges[edges.length - 1].cursor },
+        })
+      }
+      loading={loading || statLoading}
     />
   );
 };
