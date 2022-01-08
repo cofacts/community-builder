@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { styled } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import DataTable, { PAGE_SIZE } from '../../components/DataTable';
+import { GridColDef } from '@mui/x-data-grid';
 
 import {
   useFeedbackListInFeedbackTableQuery,
@@ -133,10 +134,7 @@ type Props = {
   endDate?: string;
 };
 
-const PAGE_SIZE = 50;
-
 const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
-  const [loadedPageIdx, setLoadedPageIdx] = useState<number>(1);
   const createdAtFilter = {
     GTE: startDate,
     LTE: endDate,
@@ -169,34 +167,19 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     return <p>Error: {statError}</p>;
   }
 
-  const handlePageChange: React.ComponentProps<
-    typeof DataGrid
-  >['onPageChange'] = (page) => {
-    // Nothing is required when paginating between already loaded pages
-    if (page <= loadedPageIdx) return;
-
-    fetchMore({
-      variables: { after: edges[edges.length - 1].cursor },
-    });
-    setLoadedPageIdx(page);
-  };
-
   const edges = data?.ListArticleReplyFeedbacks?.edges || [];
-  const isLoading = loading || statLoading;
   return (
-    <DataGrid
-      rows={edges.map(({ node }) => node)}
+    <DataTable
+      currentlyLoadedRows={edges.map(({ node }) => node)}
       columns={COLUMNS}
-      pagination
-      disableSelectionOnClick
-      pageSize={PAGE_SIZE}
       rowHeight={64}
       rowCount={statData?.ListArticleReplyFeedbacks?.totalCount || 0}
-      paginationMode="server"
-      rowsPerPageOptions={[]}
-      onPageChange={handlePageChange}
-      loading={isLoading}
-      hideFooterPagination={isLoading}
+      onNewPageRequest={() =>
+        fetchMore({
+          variables: { after: edges[edges.length - 1].cursor },
+        })
+      }
+      loading={loading || statLoading}
     />
   );
 };
