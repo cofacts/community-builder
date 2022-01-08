@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
-import { DataGrid, ColDef } from '@material-ui/data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import {
   useReplyRequestListInReplyRequestTableQuery,
@@ -27,14 +27,13 @@ const TextCell = styled('div')({
   '-webkit-line-clamp': 3,
 });
 
-const COLUMNS: ColDef[] = [
+const COLUMNS: GridColDef[] = [
   {
     field: 'author',
     headerName: 'Author',
     width: 160,
-    // eslint-disable-next-line react/display-name
-    renderCell: (params) => {
-      const user = params.getValue('user') as User;
+    renderCell(params) {
+      const user = params.getValue(params.id, 'user') as User;
       if (!user) return <div />;
       return (
         <Link
@@ -51,9 +50,8 @@ const COLUMNS: ColDef[] = [
     field: 'reason',
     headerName: 'Reason',
     width: 300,
-    // eslint-disable-next-line react/display-name
-    renderCell: (params) => {
-      const reason = params.getValue('reason');
+    renderCell(params) {
+      const reason = params.value;
       return <TextCell>{reason}</TextCell>;
     },
   },
@@ -62,7 +60,7 @@ const COLUMNS: ColDef[] = [
     headerName: 'Updated At',
     width: 200,
     valueGetter: (params) => {
-      const updatedAt = params.getValue('updatedAt') as UpdatedAt;
+      const updatedAt = params.value as UpdatedAt;
       if (!updatedAt) {
         return '';
       }
@@ -117,14 +115,14 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
 
   const handlePageChange: React.ComponentProps<
     typeof DataGrid
-  >['onPageChange'] = (params) => {
+  >['onPageChange'] = (page) => {
     // Nothing is required when paginating between already loaded pages
-    if (params.page <= loadedPageIdx) return;
+    if (page <= loadedPageIdx) return;
 
     fetchMore({
       variables: { after: edges[edges.length - 1].cursor },
     });
-    setLoadedPageIdx(params.page);
+    setLoadedPageIdx(page);
   };
 
   const edges = data?.ListReplyRequests?.edges || [];

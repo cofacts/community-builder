@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { styled } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
-import { DataGrid, ColDef } from '@material-ui/data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import {
   useFeedbackListInFeedbackTableQuery,
@@ -37,14 +37,13 @@ const TextCell = styled('div')({
   '-webkit-line-clamp': 3,
 });
 
-const COLUMNS: ColDef[] = [
+const COLUMNS: GridColDef[] = [
   {
     field: 'author',
     headerName: 'Author',
     width: 160,
-    // eslint-disable-next-line react/display-name
-    renderCell: (params) => {
-      const user = params.getValue('user') as User;
+    renderCell(params) {
+      const user = params.getValue(params.id, 'user') as User;
       if (!user) return <div />;
       return (
         <Link
@@ -62,7 +61,7 @@ const COLUMNS: ColDef[] = [
     headerName: 'Vote',
     width: 48,
     valueGetter: (params) => {
-      switch (params.getValue('vote')) {
+      switch (params.value) {
         case FeedbackVote.Upvote:
           return '👍';
         case FeedbackVote.Downvote:
@@ -76,9 +75,8 @@ const COLUMNS: ColDef[] = [
     field: 'comment',
     headerName: 'Comment',
     width: 300,
-    // eslint-disable-next-line react/display-name
-    renderCell: (params) => {
-      const comment = params.getValue('comment');
+    renderCell(params) {
+      const comment = params.value;
       return <TextCell>{comment}</TextCell>;
     },
   },
@@ -86,10 +84,9 @@ const COLUMNS: ColDef[] = [
     field: 'target',
     headerName: 'Article & Reply',
     width: 480,
-    // eslint-disable-next-line react/display-name
-    renderCell: (params) => {
-      const article = params.getValue('article') as Article;
-      const reply = params.getValue('reply') as Reply;
+    renderCell(params) {
+      const article = params.getValue(params.id, 'article') as Article;
+      const reply = params.getValue(params.id, 'reply') as Reply;
       return (
         <div>
           {article && (
@@ -119,7 +116,7 @@ const COLUMNS: ColDef[] = [
     headerName: 'Created At',
     width: 200,
     valueGetter: (params) => {
-      const createdAt = params.getValue('createdAt') as CreatedAt;
+      const createdAt = params.value as CreatedAt;
       if (!createdAt) {
         return '';
       }
@@ -174,14 +171,14 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
 
   const handlePageChange: React.ComponentProps<
     typeof DataGrid
-  >['onPageChange'] = (params) => {
+  >['onPageChange'] = (page) => {
     // Nothing is required when paginating between already loaded pages
-    if (params.page <= loadedPageIdx) return;
+    if (page <= loadedPageIdx) return;
 
     fetchMore({
       variables: { after: edges[edges.length - 1].cursor },
     });
-    setLoadedPageIdx(params.page);
+    setLoadedPageIdx(page);
   };
 
   const edges = data?.ListArticleReplyFeedbacks?.edges || [];
