@@ -111,8 +111,6 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     },
   });
 
-  const edges = data?.ListReplies?.edges || [];
-
   if (error) {
     return <p>Error: {error}</p>;
   }
@@ -120,6 +118,7 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     return <p>Error: {statError}</p>;
   }
 
+  const edges = data?.ListReplies?.edges || [];
   return (
     <DataTable
       currentlyLoadedRows={edges.map(({ node }) => node)}
