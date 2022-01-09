@@ -10,7 +10,14 @@ export const PAGE_SIZE = 50;
 type DataGridProps = React.ComponentPropsWithoutRef<typeof DataGrid>;
 
 type Props = {
+  /**
+   * All rows that are currently loaded, starting from first row to the last row currently loaded.
+   */
   currentlyLoadedRows: DataGridProps['rows'];
+
+  /**
+   * Invoked when the table should load new rows.
+   */
   onNewPageRequest: (page: number) => void;
 } & Omit<
   // Remove fields that may confuse user if given
