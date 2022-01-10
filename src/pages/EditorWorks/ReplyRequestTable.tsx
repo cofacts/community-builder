@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { styled } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
-import { DataGrid, ColDef } from '@material-ui/data-grid';
+import DataTable, { PAGE_SIZE } from '../../components/DataTable';
+import { GridColDef } from '@mui/x-data-grid';
 
 import {
   useReplyRequestListInReplyRequestTableQuery,
@@ -27,14 +28,13 @@ const TextCell = styled('div')({
   '-webkit-line-clamp': 3,
 });
 
-const COLUMNS: ColDef[] = [
+const COLUMNS: GridColDef[] = [
   {
     field: 'author',
     headerName: 'Author',
     width: 160,
-    // eslint-disable-next-line react/display-name
-    renderCell: (params) => {
-      const user = params.getValue('user') as User;
+    renderCell(params) {
+      const user = params.getValue(params.id, 'user') as User;
       if (!user) return <div />;
       return (
         <Link
@@ -51,9 +51,8 @@ const COLUMNS: ColDef[] = [
     field: 'reason',
     headerName: 'Reason',
     width: 300,
-    // eslint-disable-next-line react/display-name
-    renderCell: (params) => {
-      const reason = params.getValue('reason');
+    renderCell(params) {
+      const reason = params.value;
       return <TextCell>{reason}</TextCell>;
     },
   },
@@ -62,7 +61,7 @@ const COLUMNS: ColDef[] = [
     headerName: 'Updated At',
     width: 200,
     valueGetter: (params) => {
-      const updatedAt = params.getValue('updatedAt') as UpdatedAt;
+      const updatedAt = params.value as UpdatedAt;
       if (!updatedAt) {
         return '';
       }
@@ -79,10 +78,7 @@ type Props = {
   endDate?: string;
 };
 
-const PAGE_SIZE = 50;
-
 const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
-  const [loadedPageIdx, setLoadedPageIdx] = useState<number>(1);
   const createdAtFilter = {
     GTE: startDate,
     LTE: endDate,
@@ -115,34 +111,19 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     return <p>Error: {statError}</p>;
   }
 
-  const handlePageChange: React.ComponentProps<
-    typeof DataGrid
-  >['onPageChange'] = (params) => {
-    // Nothing is required when paginating between already loaded pages
-    if (params.page <= loadedPageIdx) return;
-
-    fetchMore({
-      variables: { after: edges[edges.length - 1].cursor },
-    });
-    setLoadedPageIdx(params.page);
-  };
-
   const edges = data?.ListReplyRequests?.edges || [];
-  const isLoading = loading || statLoading;
   return (
-    <DataGrid
-      rows={edges.map(({ node }) => node)}
+    <DataTable
+      currentlyLoadedRows={edges.map(({ node }) => node)}
       columns={COLUMNS}
-      pagination
-      disableSelectionOnClick
-      pageSize={PAGE_SIZE}
       rowHeight={64}
       rowCount={statData?.ListReplyRequests?.totalCount || 0}
-      paginationMode="server"
-      rowsPerPageOptions={[]}
-      onPageChange={handlePageChange}
-      loading={isLoading}
-      hideFooterPagination={isLoading}
+      onNewPageRequest={() =>
+        fetchMore({
+          variables: { after: edges[edges.length - 1].cursor },
+        })
+      }
+      loading={loading || statLoading}
     />
   );
 };
