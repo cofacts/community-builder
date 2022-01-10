@@ -68,6 +68,11 @@ const Home: React.FC = () => {
         title="Big Numbers"
         description="Instant number display to project in meetups"
       />
+      <FunctionButton
+        to="/blocked"
+        title="Spammers and spams"
+        description="Users and contents that are blocked in Cofacts"
+      />
     </Grid>
   );
 };

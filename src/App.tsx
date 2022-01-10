@@ -14,6 +14,7 @@ import NeedToCheck from './pages/NeedToCheck';
 import EditorWorks from './pages/EditorWorks';
 import BigNumSetup from './pages/BigNumSetup';
 import BigNum from './pages/BigNum';
+import Blocked from './pages/Blocked';
 
 const useStyles = makeStyles((theme) => ({
   titleLink: {
@@ -62,6 +63,9 @@ const App: React.FC = () => {
           </Route>
           <Route path="/bignum">
             <BigNum />
+          </Route>
+          <Route path="/blocked">
+            <Blocked />
           </Route>
         </Switch>
       </Container>
