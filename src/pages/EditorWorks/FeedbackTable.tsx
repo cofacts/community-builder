@@ -1,6 +1,7 @@
 import React from 'react';
 import { styled } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
+import { Link as RRLink } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
 import { GridColDef } from '@mui/x-data-grid';
@@ -46,15 +47,7 @@ const COLUMNS: GridColDef[] = [
     renderCell(params) {
       const user = params.getValue(params.id, 'user') as User;
       if (!user) return <div />;
-      return (
-        <Link
-          href={`${process.env.REACT_APP_SITE_URL}/user?id=${user.id}`}
-          color="textPrimary"
-          variant="body2"
-        >
-          {user.name}
-        </Link>
-      );
+      return <RRLink to={`?userId=${user.id}`}>{user.name}</RRLink>;
     },
   },
   {
@@ -132,9 +125,10 @@ type Props = {
   startDate?: string;
   /** Elasticsearch supported time string */
   endDate?: string;
+  userId?: string;
 };
 
-const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
+const ReplyTable: React.FC<Props> = ({ startDate, endDate, userId }) => {
   const createdAtFilter = {
     GTE: startDate,
     LTE: endDate,
@@ -145,7 +139,7 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     loading: statLoading,
     error: statError,
   } = useFeedbackListStatInFeedbackTableQuery({
-    variables: { createdAt: createdAtFilter },
+    variables: { createdAt: createdAtFilter, userId },
   });
   const {
     data,
@@ -157,6 +151,7 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate }) => {
     variables: {
       pageSize: PAGE_SIZE,
       createdAt: createdAtFilter,
+      userId,
     },
   });
 
