@@ -3,11 +3,13 @@ import { styled } from '@material-ui/core/styles';
 import { Link as RRLink } from 'react-router-dom';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
 import { GridColDef } from '@mui/x-data-grid';
+import { getSearchString, WorkType } from './util';
 
 import {
   useReplyRequestListInReplyRequestTableQuery,
   useReplyRequestListStatInReplyRequestTableQuery,
   ReplyRequestListInReplyRequestTableQuery,
+  ReplyRequestStatusEnum,
 } from '../../types';
 
 type User = NonNullable<
@@ -36,7 +38,18 @@ const COLUMNS: GridColDef[] = [
     renderCell(params) {
       const user = params.getValue(params.id, 'user') as User;
       if (!user) return <div />;
-      return <RRLink to={`?userId=${user.id}`}>{user.name}</RRLink>;
+      return (
+        <RRLink
+          to={`?${getSearchString({
+            workType: WorkType.REPLY_REQUEST,
+            day: 7,
+            userId: user.id,
+            showAll: true,
+          })}`}
+        >
+          {user.name}
+        </RRLink>
+      );
     },
   },
   {
@@ -63,26 +76,40 @@ const COLUMNS: GridColDef[] = [
   },
 ];
 
+const NORMAL_STATUSES = [ReplyRequestStatusEnum.Normal];
+const ALL_STATUSES = [
+  ReplyRequestStatusEnum.Normal,
+  ReplyRequestStatusEnum.Blocked,
+];
+
 type Props = {
   /** Elasticsearch supported time string */
   startDate?: string;
   /** Elasticsearch supported time string */
   endDate?: string;
   userId?: string;
+  /** Also shows BLOCKED reply request if true */
+  showAll?: boolean;
 };
 
-const ReplyTable: React.FC<Props> = ({ startDate, endDate, userId }) => {
+const ReplyTable: React.FC<Props> = ({
+  startDate,
+  endDate,
+  userId,
+  showAll,
+}) => {
   const createdAtFilter = {
     GTE: startDate,
     LTE: endDate,
   };
+  const statuses = showAll ? ALL_STATUSES : NORMAL_STATUSES;
 
   const {
     data: statData,
     loading: statLoading,
     error: statError,
   } = useReplyRequestListStatInReplyRequestTableQuery({
-    variables: { createdAt: createdAtFilter, userId },
+    variables: { createdAt: createdAtFilter, userId, statuses },
   });
   const {
     data,
@@ -95,6 +122,7 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate, userId }) => {
       pageSize: PAGE_SIZE,
       createdAt: createdAtFilter,
       userId,
+      statuses,
     },
   });
 

@@ -1067,6 +1067,7 @@ export type BigNumOfFeedbacksQuery = (
 export type FeedbackListStatInFeedbackTableQueryVariables = Exact<{
   createdAt?: Maybe<TimeRangeInput>;
   userId?: Maybe<Scalars['String']>;
+  statuses?: Maybe<ReadonlyArray<ArticleReplyFeedbackStatusEnum>>;
 }>;
 
 
@@ -1087,6 +1088,7 @@ export type FeedbackListInFeedbackTableQueryVariables = Exact<{
   pageSize?: Maybe<Scalars['Int']>;
   createdAt?: Maybe<TimeRangeInput>;
   userId?: Maybe<Scalars['String']>;
+  statuses?: Maybe<ReadonlyArray<ArticleReplyFeedbackStatusEnum>>;
 }>;
 
 
@@ -1118,6 +1120,7 @@ export type FeedbackListInFeedbackTableQuery = (
 export type ReplyRequestListStatInReplyRequestTableQueryVariables = Exact<{
   createdAt?: Maybe<TimeRangeInput>;
   userId?: Maybe<Scalars['String']>;
+  statuses?: Maybe<ReadonlyArray<ReplyRequestStatusEnum>>;
 }>;
 
 
@@ -1138,6 +1141,7 @@ export type ReplyRequestListInReplyRequestTableQueryVariables = Exact<{
   pageSize?: Maybe<Scalars['Int']>;
   createdAt?: Maybe<TimeRangeInput>;
   userId?: Maybe<Scalars['String']>;
+  statuses?: Maybe<ReadonlyArray<ReplyRequestStatusEnum>>;
 }>;
 
 
@@ -1311,8 +1315,8 @@ export type BigNumOfFeedbacksQueryHookResult = ReturnType<typeof useBigNumOfFeed
 export type BigNumOfFeedbacksLazyQueryHookResult = ReturnType<typeof useBigNumOfFeedbacksLazyQuery>;
 export type BigNumOfFeedbacksQueryResult = Apollo.QueryResult<BigNumOfFeedbacksQuery, BigNumOfFeedbacksQueryVariables>;
 export const FeedbackListStatInFeedbackTableDocument = gql`
-    query FeedbackListStatInFeedbackTable($createdAt: TimeRangeInput, $userId: String) {
-  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId}) {
+    query FeedbackListStatInFeedbackTable($createdAt: TimeRangeInput, $userId: String, $statuses: [ArticleReplyFeedbackStatusEnum!]) {
+  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId, statuses: $statuses}) {
     totalCount
     pageInfo {
       firstCursor
@@ -1336,6 +1340,7 @@ export const FeedbackListStatInFeedbackTableDocument = gql`
  *   variables: {
  *      createdAt: // value for 'createdAt'
  *      userId: // value for 'userId'
+ *      statuses: // value for 'statuses'
  *   },
  * });
  */
@@ -1349,7 +1354,7 @@ export type FeedbackListStatInFeedbackTableQueryHookResult = ReturnType<typeof u
 export type FeedbackListStatInFeedbackTableLazyQueryHookResult = ReturnType<typeof useFeedbackListStatInFeedbackTableLazyQuery>;
 export type FeedbackListStatInFeedbackTableQueryResult = Apollo.QueryResult<FeedbackListStatInFeedbackTableQuery, FeedbackListStatInFeedbackTableQueryVariables>;
 export const FeedbackListInFeedbackTableDocument = gql`
-    query FeedbackListInFeedbackTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput, $userId: String) {
+    query FeedbackListInFeedbackTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput, $userId: String, $statuses: [ArticleReplyFeedbackStatusEnum!]) {
   ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
     edges {
       cursor
@@ -1392,6 +1397,7 @@ export const FeedbackListInFeedbackTableDocument = gql`
  *      pageSize: // value for 'pageSize'
  *      createdAt: // value for 'createdAt'
  *      userId: // value for 'userId'
+ *      statuses: // value for 'statuses'
  *   },
  * });
  */
@@ -1405,8 +1411,8 @@ export type FeedbackListInFeedbackTableQueryHookResult = ReturnType<typeof useFe
 export type FeedbackListInFeedbackTableLazyQueryHookResult = ReturnType<typeof useFeedbackListInFeedbackTableLazyQuery>;
 export type FeedbackListInFeedbackTableQueryResult = Apollo.QueryResult<FeedbackListInFeedbackTableQuery, FeedbackListInFeedbackTableQueryVariables>;
 export const ReplyRequestListStatInReplyRequestTableDocument = gql`
-    query ReplyRequestListStatInReplyRequestTable($createdAt: TimeRangeInput, $userId: String) {
-  ListReplyRequests(filter: {createdAt: $createdAt, userId: $userId}) {
+    query ReplyRequestListStatInReplyRequestTable($createdAt: TimeRangeInput, $userId: String, $statuses: [ReplyRequestStatusEnum!]) {
+  ListReplyRequests(filter: {createdAt: $createdAt, userId: $userId, statuses: $statuses}) {
     totalCount
     pageInfo {
       firstCursor
@@ -1430,6 +1436,7 @@ export const ReplyRequestListStatInReplyRequestTableDocument = gql`
  *   variables: {
  *      createdAt: // value for 'createdAt'
  *      userId: // value for 'userId'
+ *      statuses: // value for 'statuses'
  *   },
  * });
  */
@@ -1443,8 +1450,8 @@ export type ReplyRequestListStatInReplyRequestTableQueryHookResult = ReturnType<
 export type ReplyRequestListStatInReplyRequestTableLazyQueryHookResult = ReturnType<typeof useReplyRequestListStatInReplyRequestTableLazyQuery>;
 export type ReplyRequestListStatInReplyRequestTableQueryResult = Apollo.QueryResult<ReplyRequestListStatInReplyRequestTableQuery, ReplyRequestListStatInReplyRequestTableQueryVariables>;
 export const ReplyRequestListInReplyRequestTableDocument = gql`
-    query ReplyRequestListInReplyRequestTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput, $userId: String) {
-  ListReplyRequests(filter: {createdAt: $createdAt, userId: $userId}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
+    query ReplyRequestListInReplyRequestTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput, $userId: String, $statuses: [ReplyRequestStatusEnum!]) {
+  ListReplyRequests(filter: {createdAt: $createdAt, userId: $userId, statuses: $statuses}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
     edges {
       cursor
       node {
@@ -1477,6 +1484,7 @@ export const ReplyRequestListInReplyRequestTableDocument = gql`
  *      pageSize: // value for 'pageSize'
  *      createdAt: // value for 'createdAt'
  *      userId: // value for 'userId'
+ *      statuses: // value for 'statuses'
  *   },
  * });
  */

@@ -1,6 +1,10 @@
-query FeedbackListStatInFeedbackTable($createdAt: TimeRangeInput, $userId: String) {
+query FeedbackListStatInFeedbackTable(
+  $createdAt: TimeRangeInput
+  $userId: String
+  $statuses: [ArticleReplyFeedbackStatusEnum!]
+) {
   ListArticleReplyFeedbacks(
-    filter: { createdAt: $createdAt, userId: $userId }
+    filter: { createdAt: $createdAt, userId: $userId, statuses: $statuses }
   ) {
     totalCount
     pageInfo {
@@ -10,7 +14,13 @@ query FeedbackListStatInFeedbackTable($createdAt: TimeRangeInput, $userId: Strin
   }
 }
 
-query FeedbackListInFeedbackTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput, $userId: String) {
+query FeedbackListInFeedbackTable(
+  $after: String
+  $pageSize: Int
+  $createdAt: TimeRangeInput
+  $userId: String
+  $statuses: [ArticleReplyFeedbackStatusEnum!]
+) {
   ListArticleReplyFeedbacks(
     filter: { createdAt: $createdAt, userId: $userId }
     orderBy: [{ createdAt: DESC }]

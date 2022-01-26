@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -10,6 +9,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ReplyTable from './ReplyTable';
 import FeedbackTable from './FeedbackTable';
 import ReplyRequestTable from './ReplyRequestTable';
+import { useUrlParams, WorkType } from './util';
 
 const useStyles = makeStyles((theme) => ({
   controls: {
@@ -22,47 +22,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-enum WorkType {
-  REPLY,
-  ARTICLE_REPLY_FEEDBACK,
-  REPLY_REQUEST,
-}
-
-type ParamsFromUrl = Readonly<{
-  workType: WorkType;
-  day: number;
-  userId?: string;
-}>;
-
-type GoFn = (p: ParamsFromUrl) => void;
-
-function useUrlParams(): [ParamsFromUrl, GoFn] {
-  const { search, pathname } = useLocation();
-  const { push } = useHistory();
-  const searchParams = new URLSearchParams(search);
-
-  return [
-    {
-      workType: +(searchParams.get('type') ?? WorkType.REPLY),
-      day: +(searchParams.get('day') ?? 7),
-      userId: searchParams.get('userId') || undefined,
-    },
-    (p) => {
-      const query = new URLSearchParams({
-        type: p.workType.toString(),
-        day: p.day.toString(),
-        ...(p.userId ? { userId: p.userId } : {}),
-      });
-      push(`${pathname}?${query}`);
-    },
-  ];
-}
-
 const EditorWorks: React.FC = () => {
   const classes = useStyles();
   const [param, go] = useUrlParams();
-  // eslint-disable-next-line no-console
-  console.log('param', param);
 
   return (
     <>
@@ -83,6 +45,7 @@ const EditorWorks: React.FC = () => {
           <input
             type="number"
             defaultValue={param.day}
+            key={param.day /* Recreate when day in URL changes */}
             onBlur={(e) => go({ ...param, day: +e.target.value })}
           />{' '}
           days
@@ -105,11 +68,13 @@ const EditorWorks: React.FC = () => {
           <FeedbackTable
             startDate={`now-${param.day}d`}
             userId={param.userId}
+            showAll={param.showAll}
           />
         ) : param.workType === WorkType.REPLY_REQUEST ? (
           <ReplyRequestTable
             startDate={`now-${param.day}d`}
             userId={param.userId}
+            showAll={param.showAll}
           />
         ) : null}
       </Paper>
