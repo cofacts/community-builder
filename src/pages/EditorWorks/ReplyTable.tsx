@@ -4,6 +4,7 @@ import Link from '@material-ui/core/Link';
 import { Link as RRLink } from 'react-router-dom';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
 import { GridColDef } from '@mui/x-data-grid';
+import { getSearchString, WorkType } from './util';
 
 import {
   useReplyListInReplyTableQuery,
@@ -37,7 +38,18 @@ const COLUMNS: GridColDef[] = [
     renderCell(params) {
       const user = params.getValue(params.id, 'user') as User;
       if (!user) return <div />;
-      return <RRLink to={`?userId=${user.id}`}>{user.name}</RRLink>;
+      return (
+        <RRLink
+          to={`?${getSearchString({
+            workType: WorkType.REPLY,
+            day: 7,
+            userId: user.id,
+            showAll: true,
+          })}`}
+        >
+          {user.name}
+        </RRLink>
+      );
     },
   },
   {
