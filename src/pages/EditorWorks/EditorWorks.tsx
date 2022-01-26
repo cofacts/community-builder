@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Paper from '@material-ui/core/Paper';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -9,6 +9,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ReplyTable from './ReplyTable';
 import FeedbackTable from './FeedbackTable';
 import ReplyRequestTable from './ReplyRequestTable';
+import { useUrlParams, WorkType } from './util';
 
 const useStyles = makeStyles((theme) => ({
   controls: {
@@ -21,16 +22,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-enum WorkType {
-  REPLY,
-  ARTICLE_REPLY_FEEDBACK,
-  REPLY_REQUEST,
-}
-
 const EditorWorks: React.FC = () => {
   const classes = useStyles();
-  const [workType, setWorkType] = useState<WorkType>(WorkType.REPLY);
-  const [day, setDay] = useState<number>(7);
+  const [param, go] = useUrlParams();
 
   return (
     <>
@@ -38,8 +32,8 @@ const EditorWorks: React.FC = () => {
         <CardContent classes={{ root: classes.controlContent }}>
           <TextField
             select
-            value={workType}
-            onChange={(e): void => setWorkType(+e.target.value)}
+            value={param.workType}
+            onChange={(e): void => go({ ...param, workType: +e.target.value })}
           >
             <MenuItem value={WorkType.REPLY}>Replies</MenuItem>
             <MenuItem value={WorkType.ARTICLE_REPLY_FEEDBACK}>
@@ -50,19 +44,38 @@ const EditorWorks: React.FC = () => {
           in the last{' '}
           <input
             type="number"
-            defaultValue={day}
-            onBlur={(e) => setDay(+e.target.value)}
+            defaultValue={param.day}
+            key={param.day /* Recreate when day in URL changes */}
+            onBlur={(e) => go({ ...param, day: +e.target.value })}
           />{' '}
           days
+          {param.userId && (
+            <span>
+              for user{' '}
+              <a
+                href={`${process.env.REACT_APP_SITE_URL}/user?id=${param.userId}`}
+              >
+                {param.userId}
+              </a>
+            </span>
+          )}
         </CardContent>
       </Card>
       <Paper style={{ height: 700 }}>
-        {workType === WorkType.REPLY ? (
-          <ReplyTable startDate={`now-${day}d`} />
-        ) : workType === WorkType.ARTICLE_REPLY_FEEDBACK ? (
-          <FeedbackTable startDate={`now-${day}d`} />
-        ) : workType === WorkType.REPLY_REQUEST ? (
-          <ReplyRequestTable startDate={`now-${day}d`} />
+        {param.workType === WorkType.REPLY ? (
+          <ReplyTable startDate={`now-${param.day}d`} userId={param.userId} />
+        ) : param.workType === WorkType.ARTICLE_REPLY_FEEDBACK ? (
+          <FeedbackTable
+            startDate={`now-${param.day}d`}
+            userId={param.userId}
+            showAll={param.showAll}
+          />
+        ) : param.workType === WorkType.REPLY_REQUEST ? (
+          <ReplyRequestTable
+            startDate={`now-${param.day}d`}
+            userId={param.userId}
+            showAll={param.showAll}
+          />
         ) : null}
       </Paper>
     </>
