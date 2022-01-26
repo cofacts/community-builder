@@ -22,7 +22,7 @@ query FeedbackListInFeedbackTable(
   $statuses: [ArticleReplyFeedbackStatusEnum!]
 ) {
   ListArticleReplyFeedbacks(
-    filter: { createdAt: $createdAt, userId: $userId }
+    filter: { createdAt: $createdAt, userId: $userId, statuses: $statuses }
     orderBy: [{ createdAt: DESC }]
     after: $after
     first: $pageSize

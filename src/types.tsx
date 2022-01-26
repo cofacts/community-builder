@@ -1355,7 +1355,7 @@ export type FeedbackListStatInFeedbackTableLazyQueryHookResult = ReturnType<type
 export type FeedbackListStatInFeedbackTableQueryResult = Apollo.QueryResult<FeedbackListStatInFeedbackTableQuery, FeedbackListStatInFeedbackTableQueryVariables>;
 export const FeedbackListInFeedbackTableDocument = gql`
     query FeedbackListInFeedbackTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput, $userId: String, $statuses: [ArticleReplyFeedbackStatusEnum!]) {
-  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
+  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId, statuses: $statuses}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
     edges {
       cursor
       node {
