@@ -36,6 +36,11 @@ query FeedbackListInFeedbackTable(
         article {
           id
           text
+          articleCategories(statuses: [NORMAL]) {
+            category { title }
+            positiveFeedbackCount
+            negativeFeedbackCount
+          }
         }
         reply {
           id

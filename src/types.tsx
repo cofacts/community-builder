@@ -1150,6 +1150,14 @@ export type FeedbackListInFeedbackTableQuery = (
         & { readonly article?: Maybe<(
           { readonly __typename?: 'Article' }
           & Pick<Article, 'id' | 'text'>
+          & { readonly articleCategories?: Maybe<ReadonlyArray<Maybe<(
+            { readonly __typename?: 'ArticleCategory' }
+            & Pick<ArticleCategory, 'positiveFeedbackCount' | 'negativeFeedbackCount'>
+            & { readonly category?: Maybe<(
+              { readonly __typename?: 'Category' }
+              & Pick<Category, 'title'>
+            )> }
+          )>>> }
         )>, readonly reply?: Maybe<(
           { readonly __typename?: 'Reply' }
           & Pick<Reply, 'id' | 'text'>
@@ -1413,6 +1421,13 @@ export const FeedbackListInFeedbackTableDocument = gql`
         article {
           id
           text
+          articleCategories(statuses: [NORMAL]) {
+            category {
+              title
+            }
+            positiveFeedbackCount
+            negativeFeedbackCount
+          }
         }
         reply {
           id
