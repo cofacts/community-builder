@@ -23,6 +23,7 @@ Other scripts include:
 - `npm run lint`: Runs eslint
 - `npm run lint:fix`: Runs eslint and handle fixable errors
 - `npm run typecheck`: Checks Typescript types
+- `npm run codegen`: After changing GraphQL query, run this to update Typescript types
 
 Lint and check is also invoked in Travis.
 
