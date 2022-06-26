@@ -149,6 +149,9 @@ export type Article = Node & {
 export type ArticleArticleRepliesArgs = {
   status?: Maybe<ArticleReplyStatusEnum>;
   statuses?: Maybe<ReadonlyArray<ArticleReplyStatusEnum>>;
+  appId?: Maybe<Scalars['String']>;
+  userId?: Maybe<Scalars['String']>;
+  selfOnly?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -439,6 +442,10 @@ export type ArticleReplyFeedback = Node & {
   readonly user?: Maybe<User>;
   readonly userId?: Maybe<Scalars['String']>;
   readonly appId?: Maybe<Scalars['String']>;
+  /** User ID of the reply's author */
+  readonly replyUserId: Scalars['String'];
+  /** User ID of the article-reply's author */
+  readonly articleReplyUserId: Scalars['String'];
   readonly comment?: Maybe<Scalars['String']>;
   readonly createdAt?: Maybe<Scalars['String']>;
   readonly updatedAt?: Maybe<Scalars['String']>;
@@ -667,7 +674,7 @@ export type ListArticleFilter = {
   readonly moreLikeThis?: Maybe<MoreLikeThisInput>;
   /** List only the articles whose number of replies matches the criteria. */
   readonly replyRequestCount?: Maybe<RangeInput>;
-  /** List only the articles that were replied between the specific time range. */
+  /** [Deprecated] use articleReply filter instead. List only the articles that were replied between the specific time range. */
   readonly repliedAt?: Maybe<TimeRangeInput>;
   /** Specify an articleId here to show only articles from the sender of that specified article. */
   readonly fromUserOfArticleId?: Maybe<Scalars['String']>;
@@ -679,12 +686,14 @@ export type ListArticleFilter = {
    * In both scenario, deleted article replies are not taken into account.
    */
   readonly hasArticleReplyWithMorePositiveFeedback?: Maybe<Scalars['Boolean']>;
-  /** List the articles with replies of certain types */
+  /** [Deprecated] use articleReply filter instead. List the articles with replies of certain types */
   readonly replyTypes?: Maybe<ReadonlyArray<Maybe<ReplyTypeEnum>>>;
   /** List the articles with certain types */
   readonly articleTypes?: Maybe<ReadonlyArray<Maybe<ArticleTypeEnum>>>;
   /** Show the media article similar to the input url */
   readonly mediaUrl?: Maybe<Scalars['String']>;
+  /** Show articles with article replies matching this criteria */
+  readonly articleReply?: Maybe<ArticleReplyFilterInput>;
 };
 
 /**
@@ -710,6 +719,19 @@ export type UserAndExistInput = {
   readonly exists?: Maybe<Scalars['Boolean']>;
 };
 
+export type ArticleReplyFilterInput = {
+  /** Show only articleReplies created by a specific app. */
+  readonly appId?: Maybe<Scalars['String']>;
+  /** Show only articleReplies created by the specific user. */
+  readonly userId?: Maybe<Scalars['String']>;
+  /** List only the articleReplies that were created between the specific time range. */
+  readonly createdAt?: Maybe<TimeRangeInput>;
+  /** Only list the articleReplies created by the currently logged in user */
+  readonly selfOnly?: Maybe<Scalars['Boolean']>;
+  readonly statuses?: Maybe<ReadonlyArray<ArticleReplyStatusEnum>>;
+  readonly replyTypes?: Maybe<ReadonlyArray<Maybe<ReplyTypeEnum>>>;
+};
+
 /** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
 export type ListArticleOrderBy = {
   readonly _score?: Maybe<SortOrderEnum>;
@@ -719,6 +741,7 @@ export type ListArticleOrderBy = {
   readonly replyCount?: Maybe<SortOrderEnum>;
   readonly lastRequestedAt?: Maybe<SortOrderEnum>;
   readonly lastRepliedAt?: Maybe<SortOrderEnum>;
+  readonly lastMatchingArticleReplyCreatedAt?: Maybe<SortOrderEnum>;
 };
 
 export type ListReplyFilter = {
@@ -815,6 +838,12 @@ export type ListArticleReplyFeedbackFilter = {
   readonly updatedAt?: Maybe<TimeRangeInput>;
   /** List only the article reply feedbacks with the selected statuses */
   readonly statuses?: Maybe<ReadonlyArray<ArticleReplyFeedbackStatusEnum>>;
+  /** List only the feedbacks to the replies created by this user ID */
+  readonly replyUserId?: Maybe<Scalars['String']>;
+  /** List only the feedbacks to the article-replies created by this user ID */
+  readonly articleReplyUserId?: Maybe<Scalars['String']>;
+  /** List only the feedbacks whose `replyUserId` *or* `articleReplyUserId` is this user ID */
+  readonly authorId?: Maybe<Scalars['String']>;
 };
 
 /** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
@@ -1112,6 +1141,7 @@ export type BigNumOfFeedbacksQuery = (
 export type FeedbackListStatInFeedbackTableQueryVariables = Exact<{
   createdAt?: Maybe<TimeRangeInput>;
   userId?: Maybe<Scalars['String']>;
+  articleReplyUserId?: Maybe<Scalars['String']>;
   statuses?: Maybe<ReadonlyArray<ArticleReplyFeedbackStatusEnum>>;
 }>;
 
@@ -1133,6 +1163,7 @@ export type FeedbackListInFeedbackTableQueryVariables = Exact<{
   pageSize?: Maybe<Scalars['Int']>;
   createdAt?: Maybe<TimeRangeInput>;
   userId?: Maybe<Scalars['String']>;
+  articleReplyUserId?: Maybe<Scalars['String']>;
   statuses?: Maybe<ReadonlyArray<ArticleReplyFeedbackStatusEnum>>;
 }>;
 
@@ -1371,8 +1402,8 @@ export type BigNumOfFeedbacksQueryHookResult = ReturnType<typeof useBigNumOfFeed
 export type BigNumOfFeedbacksLazyQueryHookResult = ReturnType<typeof useBigNumOfFeedbacksLazyQuery>;
 export type BigNumOfFeedbacksQueryResult = Apollo.QueryResult<BigNumOfFeedbacksQuery, BigNumOfFeedbacksQueryVariables>;
 export const FeedbackListStatInFeedbackTableDocument = gql`
-    query FeedbackListStatInFeedbackTable($createdAt: TimeRangeInput, $userId: String, $statuses: [ArticleReplyFeedbackStatusEnum!]) {
-  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId, statuses: $statuses}) {
+    query FeedbackListStatInFeedbackTable($createdAt: TimeRangeInput, $userId: String, $articleReplyUserId: String, $statuses: [ArticleReplyFeedbackStatusEnum!]) {
+  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId, articleReplyUserId: $articleReplyUserId, statuses: $statuses}) {
     totalCount
     pageInfo {
       firstCursor
@@ -1396,6 +1427,7 @@ export const FeedbackListStatInFeedbackTableDocument = gql`
  *   variables: {
  *      createdAt: // value for 'createdAt'
  *      userId: // value for 'userId'
+ *      articleReplyUserId: // value for 'articleReplyUserId'
  *      statuses: // value for 'statuses'
  *   },
  * });
@@ -1410,8 +1442,8 @@ export type FeedbackListStatInFeedbackTableQueryHookResult = ReturnType<typeof u
 export type FeedbackListStatInFeedbackTableLazyQueryHookResult = ReturnType<typeof useFeedbackListStatInFeedbackTableLazyQuery>;
 export type FeedbackListStatInFeedbackTableQueryResult = Apollo.QueryResult<FeedbackListStatInFeedbackTableQuery, FeedbackListStatInFeedbackTableQueryVariables>;
 export const FeedbackListInFeedbackTableDocument = gql`
-    query FeedbackListInFeedbackTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput, $userId: String, $statuses: [ArticleReplyFeedbackStatusEnum!]) {
-  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId, statuses: $statuses}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
+    query FeedbackListInFeedbackTable($after: String, $pageSize: Int, $createdAt: TimeRangeInput, $userId: String, $articleReplyUserId: String, $statuses: [ArticleReplyFeedbackStatusEnum!]) {
+  ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId, articleReplyUserId: $articleReplyUserId, statuses: $statuses}, orderBy: [{createdAt: DESC}], after: $after, first: $pageSize) {
     edges {
       cursor
       node {
@@ -1460,6 +1492,7 @@ export const FeedbackListInFeedbackTableDocument = gql`
  *      pageSize: // value for 'pageSize'
  *      createdAt: // value for 'createdAt'
  *      userId: // value for 'userId'
+ *      articleReplyUserId: // value for 'articleReplyUserId'
  *      statuses: // value for 'statuses'
  *   },
  * });

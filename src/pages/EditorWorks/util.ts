@@ -13,6 +13,8 @@ type ParamsFromUrl = Readonly<{
   workType: WorkType;
   day: number;
   userId?: string;
+  /** For feedback list. Lists feedbacks for a specific creator of article replies. */
+  articleReplyUserId?: string;
   showAll?: boolean;
 }>;
 
@@ -30,6 +32,9 @@ export function getSearchString(p: ParamsFromUrl): URLSearchParams {
     type: p.workType.toString(),
     day: p.day.toString(),
     ...(p.userId ? { userId: p.userId } : {}),
+    ...(p.articleReplyUserId
+      ? { articleReplyUserId: p.articleReplyUserId }
+      : {}),
     ...(p.showAll ? { showAll: '1' } : {}),
   });
 }
@@ -47,6 +52,7 @@ export function useUrlParams(): [ParamsFromUrl, GoFn] {
       workType: +(searchParams.get('type') ?? WorkType.REPLY),
       day: +(searchParams.get('day') ?? 7),
       userId: searchParams.get('userId') || undefined,
+      articleReplyUserId: searchParams.get('articleReplyUserId') || undefined,
       showAll: !!searchParams.get('showAll'),
     },
     (p) => {

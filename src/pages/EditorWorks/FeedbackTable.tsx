@@ -194,6 +194,7 @@ type Props = {
   /** Elasticsearch supported time string */
   endDate?: string;
   userId?: string;
+  articleReplyUserId?: string;
   /** Also shows BLOCKED feedbacks if true */
   showAll?: boolean;
 };
@@ -202,6 +203,7 @@ const ReplyTable: React.FC<Props> = ({
   startDate,
   endDate,
   userId,
+  articleReplyUserId,
   showAll,
 }) => {
   const createdAtFilter = {
@@ -215,7 +217,12 @@ const ReplyTable: React.FC<Props> = ({
     loading: statLoading,
     error: statError,
   } = useFeedbackListStatInFeedbackTableQuery({
-    variables: { createdAt: createdAtFilter, userId, statuses },
+    variables: {
+      createdAt: createdAtFilter,
+      userId,
+      articleReplyUserId,
+      statuses,
+    },
   });
   const {
     data,
@@ -228,6 +235,7 @@ const ReplyTable: React.FC<Props> = ({
       pageSize: PAGE_SIZE,
       createdAt: createdAtFilter,
       userId,
+      articleReplyUserId,
       statuses,
     },
   });
