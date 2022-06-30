@@ -1,6 +1,8 @@
 import React from 'react';
 import { styled } from '@material-ui/core/styles';
+import Link from '@material-ui/core/Link';
 import { Link as RRLink } from 'react-router-dom';
+import Typography from '@material-ui/core/Typography';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
 import { GridColDef } from '@mui/x-data-grid';
 import { getSearchString, WorkType } from './util';
@@ -19,6 +21,10 @@ type User = NonNullable<
 type UpdatedAt = NonNullable<
   ReplyRequestListInReplyRequestTableQuery['ListReplyRequests']
 >['edges'][number]['node']['updatedAt'];
+
+type Article = NonNullable<
+  ReplyRequestListInReplyRequestTableQuery['ListReplyRequests']
+>['edges'][number]['node']['article'];
 
 const TextCell = styled('div')({
   width: '100%',
@@ -59,6 +65,25 @@ const COLUMNS: GridColDef[] = [
     renderCell(params) {
       const reason = params.value;
       return <TextCell>{reason}</TextCell>;
+    },
+  },
+  {
+    field: 'article',
+    headerName: 'Article',
+    width: 300,
+    renderCell(params) {
+      const { id, text } = params.value as Article;
+      return (
+        <TextCell>
+          <Link
+            href={`${process.env.REACT_APP_SITE_URL}/article/${id}`}
+            color="textPrimary"
+            variant="body2"
+          >
+            <Typography variant="body2">{text || ''}</Typography>
+          </Link>
+        </TextCell>
+      );
     },
   },
   {

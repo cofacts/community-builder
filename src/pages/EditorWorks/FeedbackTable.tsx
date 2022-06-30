@@ -1,5 +1,6 @@
 import React from 'react';
 import { styled } from '@material-ui/core/styles';
+import Chip from '@material-ui/core/Chip';
 import Link from '@material-ui/core/Link';
 import { Link as RRLink } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
@@ -30,6 +31,25 @@ type Reply = NonNullable<
 type CreatedAt = NonNullable<
   FeedbackListInFeedbackTableQuery['ListArticleReplyFeedbacks']
 >['edges'][number]['node']['createdAt'];
+
+type ArticleCategory = NonNullable<
+  NonNullable<Article>['articleCategories']
+>[number];
+
+type ValidArticleCategory = NonNullable<ArticleCategory> & {
+  category: NonNullable<NonNullable<ArticleCategory>['category']>;
+};
+
+function isValidArticleCategory(
+  ar: ArticleCategory
+): ar is ValidArticleCategory {
+  return (
+    !!ar &&
+    typeof ar.positiveFeedbackCount === 'number' &&
+    typeof ar.negativeFeedbackCount === 'number' &&
+    ar.positiveFeedbackCount >= ar.negativeFeedbackCount
+  );
+}
 
 const TextCell = styled('div')({
   width: '100%',
@@ -90,7 +110,7 @@ const COLUMNS: GridColDef[] = [
   {
     field: 'target',
     headerName: 'Article & Reply',
-    width: 480,
+    width: 300,
     renderCell(params) {
       const article = params.getValue(params.id, 'article') as Article;
       const reply = params.getValue(params.id, 'reply') as Reply;
@@ -102,7 +122,9 @@ const COLUMNS: GridColDef[] = [
               color="textPrimary"
               variant="body2"
             >
-              <Typography variant="body2">{article.text || ''}</Typography>
+              <Typography variant="body2" title={article.text || ''}>
+                {article.text || ''}
+              </Typography>
             </Link>
           )}
           {reply && (
@@ -111,7 +133,9 @@ const COLUMNS: GridColDef[] = [
               color="textPrimary"
               variant="body2"
             >
-              <Typography variant="body2">{reply.text || ''}</Typography>
+              <Typography variant="body2" title={reply.text || ''}>
+                {reply.text || ''}
+              </Typography>
             </Link>
           )}
         </div>
@@ -121,7 +145,7 @@ const COLUMNS: GridColDef[] = [
   {
     field: 'createdAt',
     headerName: 'Created At',
-    width: 200,
+    width: 175,
     valueGetter: (params) => {
       const createdAt = params.value as CreatedAt;
       if (!createdAt) {
@@ -129,6 +153,31 @@ const COLUMNS: GridColDef[] = [
       }
 
       return new Date(createdAt).toLocaleString();
+    },
+  },
+  {
+    field: 'categories',
+    headerName: 'Article category',
+    width: 240,
+    renderCell(params) {
+      const article = params.getValue(params.id, 'article') as Article;
+      const categories = (article?.articleCategories || []).filter(
+        isValidArticleCategory
+      );
+      if (categories.length === 0) return '';
+
+      return (
+        <TextCell>
+          {categories.map(({ category }, idx) => (
+            <Chip
+              size="small"
+              key={idx}
+              label={category.title}
+              style={{ margin: ' 0 1px 1px 0' }}
+            />
+          ))}
+        </TextCell>
+      );
     },
   },
 ];
@@ -145,6 +194,7 @@ type Props = {
   /** Elasticsearch supported time string */
   endDate?: string;
   userId?: string;
+  articleReplyUserId?: string;
   /** Also shows BLOCKED feedbacks if true */
   showAll?: boolean;
 };
@@ -153,6 +203,7 @@ const ReplyTable: React.FC<Props> = ({
   startDate,
   endDate,
   userId,
+  articleReplyUserId,
   showAll,
 }) => {
   const createdAtFilter = {
@@ -166,7 +217,12 @@ const ReplyTable: React.FC<Props> = ({
     loading: statLoading,
     error: statError,
   } = useFeedbackListStatInFeedbackTableQuery({
-    variables: { createdAt: createdAtFilter, userId, statuses },
+    variables: {
+      createdAt: createdAtFilter,
+      userId,
+      articleReplyUserId,
+      statuses,
+    },
   });
   const {
     data,
@@ -179,6 +235,7 @@ const ReplyTable: React.FC<Props> = ({
       pageSize: PAGE_SIZE,
       createdAt: createdAtFilter,
       userId,
+      articleReplyUserId,
       statuses,
     },
   });

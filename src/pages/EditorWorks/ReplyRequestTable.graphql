@@ -37,6 +37,10 @@ query ReplyRequestListInReplyRequestTable(
           id
           name
         }
+        article {
+          id
+          text
+        }
       }
     }
   }

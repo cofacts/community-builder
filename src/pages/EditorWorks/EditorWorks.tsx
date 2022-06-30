@@ -59,6 +59,17 @@ const EditorWorks: React.FC = () => {
               </a>
             </span>
           )}
+          {param.articleReplyUserId &&
+            param.workType === WorkType.ARTICLE_REPLY_FEEDBACK && (
+              <span>
+                for article reply user{' '}
+                <a
+                  href={`${process.env.REACT_APP_SITE_URL}/user?id=${param.articleReplyUserId}`}
+                >
+                  {param.articleReplyUserId}
+                </a>
+              </span>
+            )}
         </CardContent>
       </Card>
       <Paper style={{ height: 700 }}>
@@ -68,6 +79,7 @@ const EditorWorks: React.FC = () => {
           <FeedbackTable
             startDate={`now-${param.day}d`}
             userId={param.userId}
+            articleReplyUserId={param.articleReplyUserId}
             showAll={param.showAll}
           />
         ) : param.workType === WorkType.REPLY_REQUEST ? (
