@@ -6,12 +6,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import { isSomeEnum } from '../lib/util';
 import FUN_NUMBERS from '../lib/funNumbers';
 
-const MARGIN = 80;
+const MARGIN = 8;
 const POLLING_INTERVAL = 5000;
 
 export enum PanelType {
   replied = 'replied',
   feedback = 'feedback',
+  comment = 'comment',
 }
 
 /**
@@ -47,7 +48,20 @@ const PANELS_SETUP = {
     query: gql`
       query BigNumOfFeedbacks($startTime: String) {
         query: ListArticleReplyFeedbacks(
-          filter: { createdAt: { GTE: $startTime } }
+          filter: { createdAt: { GTE: $startTime }, appId: "WEBSITE" }
+        ) {
+          totalCount
+        }
+      }
+    `,
+  },
+  [PanelType.comment]: {
+    top: '新增了',
+    bottom: '則補充',
+    query: gql`
+      query BigNumOfComments($startTime: String) {
+        query: ListReplyRequests(
+          filter: { createdAt: { GTE: $startTime }, appId: "WEBSITE" }
         ) {
           totalCount
         }
