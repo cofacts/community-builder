@@ -29,6 +29,7 @@ export type Query = {
   readonly ListArticleReplyFeedbacks?: Maybe<ListArticleReplyFeedbackConnection>;
   readonly ListReplyRequests?: Maybe<ListReplyRequestConnection>;
   readonly ListBlockedUsers: UserConnection;
+  readonly ListAnalytics: AnalyticsConnection;
   readonly ValidateSlug?: Maybe<ValidationResult>;
 };
 
@@ -107,6 +108,15 @@ export type QueryListBlockedUsersArgs = {
 };
 
 
+export type QueryListAnalyticsArgs = {
+  filter?: Maybe<ListAnalyticsFilter>;
+  orderBy?: Maybe<ReadonlyArray<Maybe<ListAnalyticsOrderBy>>>;
+  first?: Maybe<Scalars['Int']>;
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryValidateSlugArgs = {
   slug: Scalars['String'];
 };
@@ -139,7 +149,7 @@ export type Article = Node & {
   readonly stats?: Maybe<ReadonlyArray<Maybe<Analytics>>>;
   /** Message event type */
   readonly articleType: ArticleTypeEnum;
-  /** Attachment of this article */
+  /** Attachment URL for this article. */
   readonly attachmentUrl?: Maybe<Scalars['String']>;
   /** Attachment hash to search or identify files */
   readonly attachmentHash?: Maybe<Scalars['String']>;
@@ -177,6 +187,11 @@ export type ArticleRelatedArticlesArgs = {
 
 export type ArticleStatsArgs = {
   dateRange?: Maybe<TimeRangeInput>;
+};
+
+
+export type ArticleAttachmentUrlArgs = {
+  variant?: Maybe<AttachmentVariantEnum>;
 };
 
 /** Basic entity. Modeled after Relay's GraphQL Server Specification. */
@@ -637,13 +652,41 @@ export type RelatedArticleOrderBy = {
   readonly updatedAt?: Maybe<SortOrderEnum>;
 };
 
-export type Analytics = {
+export type Analytics = Node & {
   readonly __typename?: 'Analytics';
-  readonly date?: Maybe<Scalars['String']>;
+  readonly id: Scalars['ID'];
+  /** The id for the document that this analytic datapoint is for. */
+  readonly docId: Scalars['ID'];
+  /** Type of document that this analytic datapoint is for. */
+  readonly type: AnalyticsDocTypeEnum;
+  /** The day this analytic datapoint is represented, in YYYY-MM-DD format */
+  readonly date: Scalars['String'];
   readonly lineUser?: Maybe<Scalars['Int']>;
   readonly lineVisit?: Maybe<Scalars['Int']>;
   readonly webUser?: Maybe<Scalars['Int']>;
   readonly webVisit?: Maybe<Scalars['Int']>;
+  /** Sum of LIFF visitor count from all sources */
+  readonly liffUser: Scalars['Int'];
+  /** Sum of LIFF view count from all sources */
+  readonly liffVisit: Scalars['Int'];
+  readonly liff: ReadonlyArray<AnalyticsLiffEntry>;
+  /** Author of the document that this analytic datapoint measures. */
+  readonly docUserId?: Maybe<Scalars['ID']>;
+  /** Authoring app ID of the document that this analytic datapoint measures. */
+  readonly docAppId?: Maybe<Scalars['ID']>;
+};
+
+export enum AnalyticsDocTypeEnum {
+  Article = 'ARTICLE',
+  Reply = 'REPLY'
+}
+
+export type AnalyticsLiffEntry = {
+  readonly __typename?: 'AnalyticsLiffEntry';
+  /** utm_source for this LIFF stat entry. Empty string if not set. */
+  readonly source: Scalars['String'];
+  readonly user: Scalars['Int'];
+  readonly visit: Scalars['Int'];
 };
 
 export enum ArticleTypeEnum {
@@ -651,6 +694,15 @@ export enum ArticleTypeEnum {
   Image = 'IMAGE',
   Video = 'VIDEO',
   Audio = 'AUDIO'
+}
+
+export enum AttachmentVariantEnum {
+  /** The original file. Only available to logged-in users. */
+  Original = 'ORIGINAL',
+  /** Downsized file. Fixed-width webp for images; other type TBD. */
+  Preview = 'PREVIEW',
+  /** Tiny, static image representing the attachment. Fixed-height jpeg for images; other types TBD. */
+  Thumbnail = 'THUMBNAIL'
 }
 
 export type ListArticleFilter = {
@@ -931,6 +983,42 @@ export type ListBlockedUsersOrderBy = {
   readonly createdAt?: Maybe<SortOrderEnum>;
 };
 
+export type AnalyticsConnection = Connection & {
+  readonly __typename?: 'AnalyticsConnection';
+  /** The total count of the entire collection, regardless of "before", "after". */
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<AnalyticsConnectionEdge>;
+  readonly pageInfo: AnalyticsConnectionPageInfo;
+};
+
+export type AnalyticsConnectionEdge = Edge & {
+  readonly __typename?: 'AnalyticsConnectionEdge';
+  readonly node: Analytics;
+  readonly cursor: Scalars['String'];
+  readonly score?: Maybe<Scalars['Float']>;
+  readonly highlight?: Maybe<Highlights>;
+};
+
+export type AnalyticsConnectionPageInfo = PageInfo & {
+  readonly __typename?: 'AnalyticsConnectionPageInfo';
+  readonly lastCursor?: Maybe<Scalars['String']>;
+  readonly firstCursor?: Maybe<Scalars['String']>;
+};
+
+export type ListAnalyticsFilter = {
+  /** List only the activities between the specific time range. */
+  readonly date?: Maybe<TimeRangeInput>;
+  readonly type?: Maybe<AnalyticsDocTypeEnum>;
+  readonly docId?: Maybe<Scalars['ID']>;
+  readonly docUserId?: Maybe<Scalars['ID']>;
+  readonly docAppId?: Maybe<Scalars['ID']>;
+};
+
+/** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
+export type ListAnalyticsOrderBy = {
+  readonly date?: Maybe<SortOrderEnum>;
+};
+
 export type ValidationResult = {
   readonly __typename?: 'ValidationResult';
   readonly success: Scalars['Boolean'];
@@ -1135,6 +1223,19 @@ export type BigNumOfFeedbacksQuery = (
   & { readonly query?: Maybe<(
     { readonly __typename?: 'ListArticleReplyFeedbackConnection' }
     & Pick<ListArticleReplyFeedbackConnection, 'totalCount'>
+  )> }
+);
+
+export type BigNumOfCommentsQueryVariables = Exact<{
+  startTime?: Maybe<Scalars['String']>;
+}>;
+
+
+export type BigNumOfCommentsQuery = (
+  { readonly __typename?: 'Query' }
+  & { readonly query?: Maybe<(
+    { readonly __typename?: 'ListReplyRequestConnection' }
+    & Pick<ListReplyRequestConnection, 'totalCount'>
   )> }
 );
 
@@ -1370,7 +1471,7 @@ export type BigNumOfRepliedLazyQueryHookResult = ReturnType<typeof useBigNumOfRe
 export type BigNumOfRepliedQueryResult = Apollo.QueryResult<BigNumOfRepliedQuery, BigNumOfRepliedQueryVariables>;
 export const BigNumOfFeedbacksDocument = gql`
     query BigNumOfFeedbacks($startTime: String) {
-  query: ListArticleReplyFeedbacks(filter: {createdAt: {GTE: $startTime}}) {
+  query: ListArticleReplyFeedbacks(filter: {createdAt: {GTE: $startTime}, appId: "WEBSITE"}) {
     totalCount
   }
 }
@@ -1401,6 +1502,39 @@ export function useBigNumOfFeedbacksLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type BigNumOfFeedbacksQueryHookResult = ReturnType<typeof useBigNumOfFeedbacksQuery>;
 export type BigNumOfFeedbacksLazyQueryHookResult = ReturnType<typeof useBigNumOfFeedbacksLazyQuery>;
 export type BigNumOfFeedbacksQueryResult = Apollo.QueryResult<BigNumOfFeedbacksQuery, BigNumOfFeedbacksQueryVariables>;
+export const BigNumOfCommentsDocument = gql`
+    query BigNumOfComments($startTime: String) {
+  query: ListReplyRequests(filter: {createdAt: {GTE: $startTime}, appId: "WEBSITE"}) {
+    totalCount
+  }
+}
+    `;
+
+/**
+ * __useBigNumOfCommentsQuery__
+ *
+ * To run a query within a React component, call `useBigNumOfCommentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBigNumOfCommentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBigNumOfCommentsQuery({
+ *   variables: {
+ *      startTime: // value for 'startTime'
+ *   },
+ * });
+ */
+export function useBigNumOfCommentsQuery(baseOptions?: Apollo.QueryHookOptions<BigNumOfCommentsQuery, BigNumOfCommentsQueryVariables>) {
+        return Apollo.useQuery<BigNumOfCommentsQuery, BigNumOfCommentsQueryVariables>(BigNumOfCommentsDocument, baseOptions);
+      }
+export function useBigNumOfCommentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<BigNumOfCommentsQuery, BigNumOfCommentsQueryVariables>) {
+          return Apollo.useLazyQuery<BigNumOfCommentsQuery, BigNumOfCommentsQueryVariables>(BigNumOfCommentsDocument, baseOptions);
+        }
+export type BigNumOfCommentsQueryHookResult = ReturnType<typeof useBigNumOfCommentsQuery>;
+export type BigNumOfCommentsLazyQueryHookResult = ReturnType<typeof useBigNumOfCommentsLazyQuery>;
+export type BigNumOfCommentsQueryResult = Apollo.QueryResult<BigNumOfCommentsQuery, BigNumOfCommentsQueryVariables>;
 export const FeedbackListStatInFeedbackTableDocument = gql`
     query FeedbackListStatInFeedbackTable($createdAt: TimeRangeInput, $userId: String, $articleReplyUserId: String, $statuses: [ArticleReplyFeedbackStatusEnum!]) {
   ListArticleReplyFeedbacks(filter: {createdAt: $createdAt, userId: $userId, articleReplyUserId: $articleReplyUserId, statuses: $statuses}) {
