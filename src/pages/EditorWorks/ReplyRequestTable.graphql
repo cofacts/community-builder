@@ -40,6 +40,8 @@ query ReplyRequestListInReplyRequestTable(
         article {
           id
           text
+          articleType
+          attachmentUrl(variant: THUMBNAIL)
         }
       }
     }

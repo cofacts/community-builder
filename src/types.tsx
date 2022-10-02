@@ -1281,7 +1281,7 @@ export type FeedbackListInFeedbackTableQuery = (
         & Pick<ArticleReplyFeedback, 'id' | 'comment' | 'vote' | 'createdAt'>
         & { readonly article?: Maybe<(
           { readonly __typename?: 'Article' }
-          & Pick<Article, 'id' | 'text'>
+          & Pick<Article, 'id' | 'text' | 'articleType' | 'attachmentUrl'>
           & { readonly articleCategories?: Maybe<ReadonlyArray<Maybe<(
             { readonly __typename?: 'ArticleCategory' }
             & Pick<ArticleCategory, 'positiveFeedbackCount' | 'negativeFeedbackCount'>
@@ -1345,7 +1345,7 @@ export type ReplyRequestListInReplyRequestTableQuery = (
           & Pick<User, 'id' | 'name'>
         )>, readonly article: (
           { readonly __typename?: 'Article' }
-          & Pick<Article, 'id' | 'text'>
+          & Pick<Article, 'id' | 'text' | 'articleType' | 'attachmentUrl'>
         ) }
       ) }
     )> }
@@ -1594,6 +1594,8 @@ export const FeedbackListInFeedbackTableDocument = gql`
             positiveFeedbackCount
             negativeFeedbackCount
           }
+          articleType
+          attachmentUrl(variant: THUMBNAIL)
         }
         reply {
           id
@@ -1695,6 +1697,8 @@ export const ReplyRequestListInReplyRequestTableDocument = gql`
         article {
           id
           text
+          articleType
+          attachmentUrl(variant: THUMBNAIL)
         }
       }
     }
