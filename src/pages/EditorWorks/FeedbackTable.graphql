@@ -53,6 +53,8 @@ query FeedbackListInFeedbackTable(
             positiveFeedbackCount
             negativeFeedbackCount
           }
+          articleType
+          attachmentUrl(variant: THUMBNAIL)
         }
         reply {
           id

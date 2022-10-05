@@ -72,15 +72,34 @@ const COLUMNS: GridColDef[] = [
     headerName: 'Article',
     width: 300,
     renderCell(params) {
-      const { id, text } = params.value as Article;
+      const article = params.value as Article;
       return (
         <TextCell>
           <Link
-            href={`${process.env.REACT_APP_SITE_URL}/article/${id}`}
+            href={`${process.env.REACT_APP_SITE_URL}/article/${article.id}`}
             color="textPrimary"
             variant="body2"
           >
-            <Typography variant="body2">{text || ''}</Typography>
+            {(() => {
+              switch (article.articleType) {
+                case 'IMAGE':
+                  return article.attachmentUrl ? (
+                    <img
+                      style={{ height: 64, verticalAlign: 'bottom' }}
+                      src={article.attachmentUrl}
+                      alt={article.id}
+                    />
+                  ) : (
+                    'Image'
+                  );
+                default:
+                  return (
+                    <Typography variant="body2" title={article.text || ''}>
+                      {article.text || ''}
+                    </Typography>
+                  );
+              }
+            })()}
           </Link>
         </TextCell>
       );

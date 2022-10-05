@@ -114,32 +114,56 @@ const COLUMNS: GridColDef[] = [
     renderCell(params) {
       const article = params.getValue(params.id, 'article') as Article;
       const reply = params.getValue(params.id, 'reply') as Reply;
-      return (
-        <div>
-          {article && (
-            <Link
-              href={`${process.env.REACT_APP_SITE_URL}/article/${article.id}`}
-              color="textPrimary"
-              variant="body2"
-            >
-              <Typography variant="body2" title={article.text || ''}>
-                {article.text || ''}
-              </Typography>
-            </Link>
-          )}
-          {reply && (
-            <Link
-              href={`${process.env.REACT_APP_SITE_URL}/reply/${reply.id}`}
-              color="textPrimary"
-              variant="body2"
-            >
-              <Typography variant="body2" title={reply.text || ''}>
-                {reply.text || ''}
-              </Typography>
-            </Link>
-          )}
-        </div>
+
+      const replyElem = reply && (
+        <Link
+          href={`${process.env.REACT_APP_SITE_URL}/reply/${reply.id}`}
+          color="textPrimary"
+          variant="body2"
+        >
+          <Typography variant="body2" title={reply.text || ''}>
+            {reply.text || ''}
+          </Typography>
+        </Link>
       );
+
+      // Make Typescript happy, never happen
+      if (!article) return '';
+
+      switch (article.articleType) {
+        case 'IMAGE':
+          // Make Typescript happy, never happen
+          if (!article.attachmentUrl) return '';
+          return (
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <Link
+                href={`${process.env.REACT_APP_SITE_URL}/article/${article.id}`}
+              >
+                <img
+                  style={{ height: 64, verticalAlign: 'bottom' }}
+                  src={article.attachmentUrl}
+                  alt={article.id}
+                />
+              </Link>
+              {replyElem}
+            </div>
+          );
+        default:
+          return (
+            <div>
+              <Link
+                href={`${process.env.REACT_APP_SITE_URL}/article/${article.id}`}
+                color="textPrimary"
+                variant="body2"
+              >
+                <Typography variant="body2" title={article.text || ''}>
+                  {article.text || ''}
+                </Typography>
+              </Link>
+              {replyElem}
+            </div>
+          );
+      }
     },
   },
   {
