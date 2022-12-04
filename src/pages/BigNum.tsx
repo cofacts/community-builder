@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery, gql } from '@apollo/client';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/material/styles';
 import { isSomeEnum } from '../lib/util';
 import FUN_NUMBERS from '../lib/funNumbers';
 
@@ -136,16 +136,12 @@ const useStyles = makeStyles({
 });
 
 type BigNumDisplayProps = {
-  rootProps: JSX.IntrinsicElements['div'];
+  rootProps: React.ComponentPropsWithoutRef<'div'>;
   start: Setup['start'];
   panelType: PanelType;
 };
 
-const BigNumDisplay: React.FC<BigNumDisplayProps> = ({
-  rootProps,
-  start,
-  panelType,
-}) => {
+const BigNumDisplay = ({ rootProps, start, panelType }: BigNumDisplayProps) => {
   const classes = useStyles();
   const { top, bottom, query } = PANELS_SETUP[panelType];
 
@@ -190,7 +186,9 @@ const BigNumDisplay: React.FC<BigNumDisplayProps> = ({
 };
 
 type ResizerProp = {
-  children: (props: JSX.IntrinsicElements['div']) => JSX.Element;
+  children: (
+    props: React.ComponentPropsWithoutRef<'div'>
+  ) => React.ReactElement;
 };
 
 const Resizer: React.FC<ResizerProp> = ({ children }) => {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { styled } from '@material-ui/core/styles';
-import Link from '@material-ui/core/Link';
+import { styled } from '@mui/material/styles';
+import Link from '@mui/material/Link';
 import { Link as RRLink } from 'react-router-dom';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
 import { GridColDef } from '@mui/x-data-grid';
@@ -88,13 +88,13 @@ const COLUMNS: GridColDef[] = [
   },
 ];
 
-type Props = {
+type Props = React.PropsWithChildren<{
   /** Elasticsearch supported time string */
   startDate?: string;
   /** Elasticsearch supported time string */
   endDate?: string;
   userId?: string;
-};
+}>;
 
 const ReplyTable: React.FC<Props> = ({ startDate, endDate, userId }) => {
   const createdAtFilter = {

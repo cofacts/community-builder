@@ -1,9 +1,9 @@
 import React from 'react';
-import { styled } from '@material-ui/core/styles';
-import Chip from '@material-ui/core/Chip';
-import Link from '@material-ui/core/Link';
+import { styled } from '@mui/material/styles';
+import Chip from '@mui/material/Chip';
+import Link from '@mui/material/Link';
 import { Link as RRLink } from 'react-router-dom';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
 import { GridColDef } from '@mui/x-data-grid';
 import { getSearchString, WorkType } from './util';
