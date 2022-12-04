@@ -96,7 +96,7 @@ type Props = React.PropsWithChildren<{
   userId?: string;
 }>;
 
-const ReplyTable: React.FC<Props> = ({ startDate, endDate, userId }) => {
+const ReplyTable = ({ startDate, endDate, userId }: Props) => {
   const createdAtFilter = {
     GTE: startDate,
     LTE: endDate,
@@ -119,10 +119,10 @@ const ReplyTable: React.FC<Props> = ({ startDate, endDate, userId }) => {
   });
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <p>Error: {error.toString()}</p>;
   }
   if (statError) {
-    return <p>Error: {statError}</p>;
+    return <p>Error: {statError.toString()}</p>;
   }
 
   const edges = data?.ListReplies?.edges || [];

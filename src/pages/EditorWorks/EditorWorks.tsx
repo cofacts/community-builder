@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const EditorWorks: React.FC = () => {
+const EditorWorks = () => {
   const classes = useStyles();
   const [param, go] = useUrlParams();
 

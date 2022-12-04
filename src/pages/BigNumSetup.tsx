@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const BigNumSetup: React.FC = () => {
+const BigNumSetup = () => {
   const classes = useStyles();
   const history = useHistory();
 
@@ -32,8 +32,8 @@ const BigNumSetup: React.FC = () => {
     e.preventDefault();
     const query = new URLSearchParams(
       // FIXME: bug in URLSearchParams type (https://github.com/Microsoft/TypeScript/issues/30584)
-      // @ts-ignore
-      new FormData(e.target)
+      //
+      new FormData(e.currentTarget) as any
     ).toString();
 
     history.push('/bignum?' + query);

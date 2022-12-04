@@ -191,7 +191,7 @@ type ResizerProp = {
   ) => React.ReactElement;
 };
 
-const Resizer: React.FC<ResizerProp> = ({ children }) => {
+const Resizer = ({ children }: ResizerProp) => {
   const classes = useStyles();
   const [scale, setScale] = useState(1);
   const resizerRef = useRef<HTMLDivElement>(null);
@@ -223,7 +223,7 @@ const Resizer: React.FC<ResizerProp> = ({ children }) => {
   );
 };
 
-const BigNum: React.FC = () => {
+const BigNum = () => {
   const { search } = useLocation();
   const classes = useStyles();
 

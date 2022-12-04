@@ -20,7 +20,7 @@ type Setup = {
   noUsefulSortOrder: SortOrder;
 };
 
-const NeedToCheck: React.FC = () => {
+const NeedToCheck = () => {
   const { search } = useLocation();
   const searchParams = new URLSearchParams(search);
   const notRepliedCount = +searchParams.get(

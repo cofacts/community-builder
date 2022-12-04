@@ -1,6 +1,6 @@
 import React from 'react';
 
-const NeedToCheckSetup: React.FC = () => {
+const NeedToCheckSetup = () => {
   return <div>Need-to-check form</div>;
 };
 

@@ -20,11 +20,7 @@ type FunctionButtonProps = {
   description: string;
 };
 
-const FunctionButton: React.FC<FunctionButtonProps> = ({
-  to,
-  title,
-  description,
-}) => {
+const FunctionButton = ({ to, title, description }: FunctionButtonProps) => {
   const classes = useStyles();
 
   return (
@@ -45,7 +41,7 @@ const FunctionButton: React.FC<FunctionButtonProps> = ({
   );
 };
 
-const Home: React.FC = () => {
+const Home = () => {
   return (
     <Grid container spacing={2}>
       <FunctionButton
