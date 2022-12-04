@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { makeStyles } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 const BigNumSetup = () => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ const BigNumSetup = () => {
       new FormData(e.currentTarget) as any
     ).toString();
 
-    history.push('/bignum?' + query);
+    navigate('/bignum?' + query);
   };
 
   return (

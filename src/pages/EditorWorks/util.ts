@@ -1,4 +1,4 @@
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export enum WorkType {
   REPLY,
@@ -44,7 +44,7 @@ export function getSearchString(p: ParamsFromUrl): URLSearchParams {
  */
 export function useUrlParams(): [ParamsFromUrl, GoFn] {
   const { search, pathname } = useLocation();
-  const { push } = useHistory();
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(search);
 
   return [
@@ -56,7 +56,7 @@ export function useUrlParams(): [ParamsFromUrl, GoFn] {
       showAll: !!searchParams.get('showAll'),
     },
     (p) => {
-      push(`${pathname}?${getSearchString(p)}`);
+      navigate(`${pathname}?${getSearchString(p)}`);
     },
   ];
 }
