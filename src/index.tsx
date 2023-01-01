@@ -1,11 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import CssBaseline from '@mui/material/CssBaseline';
-import {
-  ThemeProvider,
-  Theme,
-  StyledEngineProvider,
-} from '@mui/material/styles';
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 
 import { ApolloProvider } from '@apollo/client';
 import { HashRouter as Router } from 'react-router-dom';
@@ -14,11 +10,6 @@ import theme from './lib/theme';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-
-declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

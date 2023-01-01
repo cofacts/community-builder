@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import styled from '@emotion/styled';
+import { css } from '@emotion/css';
 import { useLocation } from 'react-router-dom';
 import { useQuery, gql } from '@apollo/client';
 
-import { makeStyles } from '@mui/material/styles';
 import { isSomeEnum } from '../lib/util';
 import FUN_NUMBERS from '../lib/funNumbers';
 
@@ -72,68 +73,41 @@ const PANELS_SETUP = {
 
 const DISPLAY_SIZE = 768;
 
-const useStyles = makeStyles({
-  displays: {
-    position: 'fixed',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    display: 'flex',
-    background: '#fff',
-  },
-  resizer: {
-    flex: 1,
-    position: 'relative', // contains resized display & the border
-  },
-  display: {
-    position: 'absolute',
-    width: DISPLAY_SIZE,
-    height: DISPLAY_SIZE,
-    left: '50%',
-    top: '50%',
-    display: 'flex',
-    flexFlow: 'column',
-    justifyContent: 'space-around',
-    textAlign: 'center',
-    '& > p': {
-      margin: 0,
-    },
-  },
-  time: {
-    fontSize: 36,
-    fontWeight: 200,
-  },
-  top: {
-    fontSize: 64,
-    fontWeight: 600,
-  },
-  bottom: {
-    fontSize: 44,
-    fontWeight: 600,
-  },
-  number: {
-    fontSize: 360,
-    lineHeight: 1,
-    fontWeight: 400,
-  },
-  funNumber: {
-    fontSize: 360,
-    fontWeight: 100,
-  },
-  funParagraph: {
-    fontSize: 84,
-    fontWeight: 600,
-  },
-  border: {
-    position: 'absolute',
-    border: '8px solid rgba(0,0,0,0.64)',
-    top: 24,
-    right: 24,
-    bottom: 24,
-    left: 24,
-  },
-});
+const displayClasses = {
+  time: css`
+    font-size: 36px;
+    font-weight: 200;
+  `,
+  top: css`
+    font-size: 64px;
+    font-weight: 600;
+  `,
+  bottom: css`
+    font-size: 44px;
+    font-weight: 600;
+  `,
+  number: css`
+    font-size: 360px;
+    line-height: 1;
+    font-weight: 400;
+  `,
+  funNumber: css`
+    font-size: 360px;
+    font-weight: 100;
+  `,
+  funParagraph: css`
+    font-size: 84px;
+    font-weight: 600;
+  `,
+  border: css`
+    position: absolute;
+    border: 8px solid rgba(0, 0, 0, 0.64);
+    top: 24px;
+    right: 24px;
+    bottom: 24px;
+    left: 24px;
+  `,
+};
 
 type BigNumDisplayProps = {
   rootProps: React.ComponentPropsWithoutRef<'div'>;
@@ -142,7 +116,6 @@ type BigNumDisplayProps = {
 };
 
 const BigNumDisplay = ({ rootProps, start, panelType }: BigNumDisplayProps) => {
-  const classes = useStyles();
   const { top, bottom, query } = PANELS_SETUP[panelType];
 
   const { data, loading, error } = useQuery(query, {
@@ -166,21 +139,21 @@ const BigNumDisplay = ({ rootProps, start, panelType }: BigNumDisplayProps) => {
     return (
       <>
         <div {...rootProps}>
-          {top && <p className={classes.funParagraph}>{top}</p>}
-          <p className={classes.funNumber}>{numberStr}</p>
-          {bottom && <p className={classes.funParagraph}>{bottom}</p>}
+          {top && <p className={displayClasses.funParagraph}>{top}</p>}
+          <p className={displayClasses.funNumber}>{numberStr}</p>
+          {bottom && <p className={displayClasses.funParagraph}>{bottom}</p>}
         </div>
-        <div className={classes.border} />
+        <div className={displayClasses.border} />
       </>
     );
   }
 
   return (
     <div {...rootProps}>
-      <p className={classes.time}>自 {start.toLocaleString()} 起</p>
-      <p className={classes.top}>{top}</p>
-      <p className={classes.number}>{numberStr}</p>
-      <p className={classes.bottom}>{bottom}</p>
+      <p className={displayClasses.time}>自 {start.toLocaleString()} 起</p>
+      <p className={displayClasses.top}>{top}</p>
+      <p className={displayClasses.number}>{numberStr}</p>
+      <p className={displayClasses.bottom}>{bottom}</p>
     </div>
   );
 };
@@ -191,8 +164,22 @@ type ResizerProp = {
   ) => React.ReactElement;
 };
 
+const displayCls = css`
+  position: absolute;
+  width: ${DISPLAY_SIZE}px;
+  height: ${DISPLAY_SIZE}px;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-around;
+  text-align: center;
+  & > p {
+    margin: 0;
+  }
+`;
+
 const Resizer = ({ children }: ResizerProp) => {
-  const classes = useStyles();
   const [scale, setScale] = useState(1);
   const resizerRef = useRef<HTMLDivElement>(null);
 
@@ -214,18 +201,29 @@ const Resizer = ({ children }: ResizerProp) => {
   }, []);
 
   return (
-    <div className={classes.resizer} ref={resizerRef}>
+    <div style={{ flex: 1, position: 'relative' }} ref={resizerRef}>
       {children({
-        className: classes.display,
-        style: { transform: `translate(-50%, -50%) scale(${scale})` },
+        className: displayCls,
+        style: {
+          transform: `translate(-50%, -50%) scale(${scale})`,
+        },
       })}
     </div>
   );
 };
 
+const Displays = styled.div`
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  background: #fff;
+`;
+
 const BigNum = () => {
   const { search } = useLocation();
-  const classes = useStyles();
 
   const searchParams = new URLSearchParams(search);
   const startParam = searchParams.get('start');
@@ -240,7 +238,7 @@ const BigNum = () => {
   });
 
   return (
-    <div className={classes.displays}>
+    <Displays>
       {panels.map((panelType) => (
         <Resizer key={panelType}>
           {(props) => (
@@ -252,7 +250,7 @@ const BigNum = () => {
           )}
         </Resizer>
       ))}
-    </div>
+    </Displays>
   );
 };
 

@@ -2,7 +2,6 @@ import React from 'react';
 import Paper from '@mui/material/Paper';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import { makeStyles } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 
@@ -11,25 +10,13 @@ import FeedbackTable from './FeedbackTable';
 import ReplyRequestTable from './ReplyRequestTable';
 import { useUrlParams, WorkType } from './util';
 
-const useStyles = makeStyles((theme) => ({
-  controls: {
-    marginBottom: theme.spacing(2),
-  },
-  controlContent: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-}));
-
 const EditorWorks = () => {
-  const classes = useStyles();
   const [param, go] = useUrlParams();
 
   return (
     <>
-      <Card classes={{ root: classes.controls }}>
-        <CardContent classes={{ root: classes.controlContent }}>
+      <Card sx={{ mb: 2 }}>
+        <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <TextField
             select
             value={param.workType}

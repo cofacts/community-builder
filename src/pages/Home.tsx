@@ -1,18 +1,16 @@
 import React from 'react';
+import styled from '@emotion/styled';
 import { Link, LinkProps } from 'react-router-dom';
 
-import { makeStyles } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 
-const useStyles = makeStyles({
-  link: {
-    textDecoration: 'none',
-  },
-});
+const PlainLink = styled(Link)`
+  text-decoration: none;
+`;
 
 type FunctionButtonProps = {
   to: LinkProps['to'];
@@ -21,11 +19,9 @@ type FunctionButtonProps = {
 };
 
 const FunctionButton = ({ to, title, description }: FunctionButtonProps) => {
-  const classes = useStyles();
-
   return (
     <Grid item xs={12} sm={6}>
-      <Link className={classes.link} to={to}>
+      <PlainLink to={to}>
         <Card>
           <CardActionArea>
             <CardContent>
@@ -36,7 +32,7 @@ const FunctionButton = ({ to, title, description }: FunctionButtonProps) => {
             </CardContent>
           </CardActionArea>
         </Card>
-      </Link>
+      </PlainLink>
     </Grid>
   );
 };

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { makeStyles } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -14,18 +13,7 @@ import Checkbox from '@mui/material/Checkbox';
 
 import { PanelType } from './BigNum';
 
-const useStyles = makeStyles((theme) => ({
-  setup: {
-    margin: `${theme.spacing(2)} auto`,
-  },
-  panelsetup: {
-    marginTop: theme.spacing(4),
-    marginBottom: theme.spacing(1),
-  },
-}));
-
 const BigNumSetup = () => {
-  const classes = useStyles();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,7 +29,7 @@ const BigNumSetup = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card classes={{ root: classes.setup }}>
+      <Card sx={{ mx: 'auto', my: 2 }}>
         <CardContent>
           <Typography variant="h4" gutterBottom>
             Display settings
@@ -52,7 +40,7 @@ const BigNumSetup = () => {
             type="datetime-local"
             InputLabelProps={{ shrink: true }}
           />
-          <FormLabel component="legend" classes={{ root: classes.panelsetup }}>
+          <FormLabel component="legend" sx={{ mt: 4, mb: 1 }}>
             Numbers to show
           </FormLabel>
           <FormGroup>
