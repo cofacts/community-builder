@@ -2,12 +2,12 @@ import React from 'react';
 import { useLoadApiStatsQuery } from '../types';
 import { getThousandSep } from '../lib/util';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 
 const POLLING_INTERVAL = 5000;
 
@@ -16,7 +16,7 @@ type StatItemProps = {
   value: string;
 };
 
-const StatItem: React.FC<StatItemProps> = ({ name, value }) => {
+const StatItem = ({ name, value }: StatItemProps) => {
   return (
     <Grid item xs={12} sm={4}>
       <Card>
@@ -31,7 +31,7 @@ const StatItem: React.FC<StatItemProps> = ({ name, value }) => {
   );
 };
 
-const APIStats: React.FC = () => {
+const APIStats = () => {
   const { data, loading } = useLoadApiStatsQuery({
     pollInterval: POLLING_INTERVAL,
   });

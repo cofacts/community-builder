@@ -1,8 +1,8 @@
 import React from 'react';
-import { styled } from '@material-ui/core/styles';
-import Link from '@material-ui/core/Link';
+import { styled } from '@mui/material/styles';
+import Link from '@mui/material/Link';
 import { Link as RRLink } from 'react-router-dom';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
 import { GridColDef } from '@mui/x-data-grid';
 import { getSearchString, WorkType } from './util';
@@ -136,12 +136,7 @@ type Props = {
   showAll?: boolean;
 };
 
-const ReplyTable: React.FC<Props> = ({
-  startDate,
-  endDate,
-  userId,
-  showAll,
-}) => {
+const ReplyTable = ({ startDate, endDate, userId, showAll }: Props) => {
   const createdAtFilter = {
     GTE: startDate,
     LTE: endDate,
@@ -155,26 +150,22 @@ const ReplyTable: React.FC<Props> = ({
   } = useReplyRequestListStatInReplyRequestTableQuery({
     variables: { createdAt: createdAtFilter, userId, statuses },
   });
-  const {
-    data,
-    loading,
-    error,
-    fetchMore,
-  } = useReplyRequestListInReplyRequestTableQuery({
-    notifyOnNetworkStatusChange: true,
-    variables: {
-      pageSize: PAGE_SIZE,
-      createdAt: createdAtFilter,
-      userId,
-      statuses,
-    },
-  });
+  const { data, loading, error, fetchMore } =
+    useReplyRequestListInReplyRequestTableQuery({
+      notifyOnNetworkStatusChange: true,
+      variables: {
+        pageSize: PAGE_SIZE,
+        createdAt: createdAtFilter,
+        userId,
+        statuses,
+      },
+    });
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <p>Error: {error.toString()}</p>;
   }
   if (statError) {
-    return <p>Error: {statError}</p>;
+    return <p>Error: {statError.toString()}</p>;
   }
 
   const edges = data?.ListReplyRequests?.edges || [];

@@ -11,7 +11,7 @@ export function getThousandSep(num: number): string {
  * @param enum
  * @returns type guard of the enum
  */
-export function isSomeEnum<T>(e: T) {
-  return (token: any): token is T[keyof T] =>
+export function isSomeEnum<T extends object>(e: T) {
+  return (token: unknown): token is T[keyof T] =>
     Object.values(e).includes(token as T[keyof T]);
 }

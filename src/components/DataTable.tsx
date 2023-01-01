@@ -29,12 +29,12 @@ type Props = {
   | 'pagination'
 >;
 
-const DataTable: React.FC<Props> = ({
+const DataTable = ({
   currentlyLoadedRows,
   onNewPageRequest,
   loading,
   ...otherDataGridProps
-}) => {
+}: Props) => {
   const [page, setPage] = useState<number>(0);
   // Determine already loaded page idx according to data already in cache
   const [loadedPageIdx, setLoadedPageIdx] = useState<number>(

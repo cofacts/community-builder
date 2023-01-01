@@ -1,47 +1,35 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import { useNavigate } from 'react-router-dom';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import FormLabel from '@mui/material/FormLabel';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 import { PanelType } from './BigNum';
 
-const useStyles = makeStyles((theme) => ({
-  setup: {
-    margin: `${theme.spacing(2)}px auto`,
-  },
-  panelsetup: {
-    marginTop: theme.spacing(4),
-    marginBottom: theme.spacing(1),
-  },
-}));
-
-const BigNumSetup: React.FC = () => {
-  const classes = useStyles();
-  const history = useHistory();
+const BigNumSetup = () => {
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const query = new URLSearchParams(
       // FIXME: bug in URLSearchParams type (https://github.com/Microsoft/TypeScript/issues/30584)
-      // @ts-ignore
-      new FormData(e.target)
+      //
+      new FormData(e.currentTarget) as any
     ).toString();
 
-    history.push('/bignum?' + query);
+    navigate('/bignum?' + query);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card classes={{ root: classes.setup }}>
+      <Card sx={{ mx: 'auto', my: 2 }}>
         <CardContent>
           <Typography variant="h4" gutterBottom>
             Display settings
@@ -52,7 +40,7 @@ const BigNumSetup: React.FC = () => {
             type="datetime-local"
             InputLabelProps={{ shrink: true }}
           />
-          <FormLabel component="legend" classes={{ root: classes.panelsetup }}>
+          <FormLabel component="legend" sx={{ mt: 4, mb: 1 }}>
             Numbers to show
           </FormLabel>
           <FormGroup>

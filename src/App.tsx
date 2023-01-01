@@ -1,11 +1,11 @@
 import React from 'react';
-import { Route, Switch, Link } from 'react-router-dom';
+import { Route, Routes, Link } from 'react-router-dom';
 
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
+import styled from '@emotion/styled';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
 
 import Home from './pages/Home';
 import APIStats from './pages/APIStats';
@@ -15,55 +15,34 @@ import EditorWorks from './pages/EditorWorks';
 import BigNumSetup from './pages/BigNumSetup';
 import BigNum from './pages/BigNum';
 
-const useStyles = makeStyles((theme) => ({
-  titleLink: {
-    color: 'inherit',
-    textDecoration: 'none',
-    '&:hover': {
-      textDecoration: 'underline',
-    },
-  },
-  gridContainer: {
-    marginTop: theme.spacing(2),
-  },
-}));
+const TitleLink = styled(Link)`
+  color: inherit;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 
-const App: React.FC = () => {
-  const classes = useStyles();
-
+const App = () => {
   return (
     <>
       <AppBar color="secondary" position="static">
         <Toolbar>
-          <Link to="/" className={classes.titleLink}>
+          <TitleLink to="/">
             <Typography variant="h6">Cofacts Community Builder</Typography>
-          </Link>
+          </TitleLink>
         </Toolbar>
       </AppBar>
-      <Container classes={{ root: classes.gridContainer }} maxWidth="lg">
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route path="/stats">
-            <APIStats />
-          </Route>
-          <Route path="/need-to-check/setup">
-            <NeedToCheckSetup />
-          </Route>
-          <Route path="/need-to-check">
-            <NeedToCheck />
-          </Route>
-          <Route path="/editorworks">
-            <EditorWorks />
-          </Route>
-          <Route path="/bignum/setup">
-            <BigNumSetup />
-          </Route>
-          <Route path="/bignum">
-            <BigNum />
-          </Route>
-        </Switch>
+      <Container sx={{ mt: 2 }} maxWidth="lg">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/stats" element={<APIStats />} />
+          <Route path="/need-to-check/setup" element={<NeedToCheckSetup />} />
+          <Route path="/need-to-check" element={<NeedToCheck />} />
+          <Route path="/editorworks" element={<EditorWorks />} />
+          <Route path="/bignum/setup" element={<BigNumSetup />} />
+          <Route path="/bignum" element={<BigNum />} />
+        </Routes>
       </Container>
     </>
   );

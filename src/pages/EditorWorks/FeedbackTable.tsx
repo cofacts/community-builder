@@ -1,9 +1,9 @@
 import React from 'react';
-import { styled } from '@material-ui/core/styles';
-import Chip from '@material-ui/core/Chip';
-import Link from '@material-ui/core/Link';
+import { styled } from '@mui/material/styles';
+import Chip from '@mui/material/Chip';
+import Link from '@mui/material/Link';
 import { Link as RRLink } from 'react-router-dom';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
 import { GridColDef } from '@mui/x-data-grid';
 import { getSearchString, WorkType } from './util';
@@ -223,13 +223,13 @@ type Props = {
   showAll?: boolean;
 };
 
-const ReplyTable: React.FC<Props> = ({
+const ReplyTable = ({
   startDate,
   endDate,
   userId,
   articleReplyUserId,
   showAll,
-}) => {
+}: Props) => {
   const createdAtFilter = {
     GTE: startDate,
     LTE: endDate,
@@ -248,27 +248,23 @@ const ReplyTable: React.FC<Props> = ({
       statuses,
     },
   });
-  const {
-    data,
-    loading,
-    error,
-    fetchMore,
-  } = useFeedbackListInFeedbackTableQuery({
-    notifyOnNetworkStatusChange: true,
-    variables: {
-      pageSize: PAGE_SIZE,
-      createdAt: createdAtFilter,
-      userId,
-      articleReplyUserId,
-      statuses,
-    },
-  });
+  const { data, loading, error, fetchMore } =
+    useFeedbackListInFeedbackTableQuery({
+      notifyOnNetworkStatusChange: true,
+      variables: {
+        pageSize: PAGE_SIZE,
+        createdAt: createdAtFilter,
+        userId,
+        articleReplyUserId,
+        statuses,
+      },
+    });
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <p>Error: {error.toString()}</p>;
   }
   if (statError) {
-    return <p>Error: {statError}</p>;
+    return <p>Error: {statError.toString()}</p>;
   }
 
   const edges = data?.ListArticleReplyFeedbacks?.edges || [];

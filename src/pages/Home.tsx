@@ -1,18 +1,16 @@
 import React from 'react';
+import styled from '@emotion/styled';
 import { Link, LinkProps } from 'react-router-dom';
 
-import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardActionArea from '@mui/material/CardActionArea';
+import CardContent from '@mui/material/CardContent';
 
-const useStyles = makeStyles({
-  link: {
-    textDecoration: 'none',
-  },
-});
+const PlainLink = styled(Link)`
+  text-decoration: none;
+`;
 
 type FunctionButtonProps = {
   to: LinkProps['to'];
@@ -20,16 +18,10 @@ type FunctionButtonProps = {
   description: string;
 };
 
-const FunctionButton: React.FC<FunctionButtonProps> = ({
-  to,
-  title,
-  description,
-}) => {
-  const classes = useStyles();
-
+const FunctionButton = ({ to, title, description }: FunctionButtonProps) => {
   return (
     <Grid item xs={12} sm={6}>
-      <Link className={classes.link} to={to}>
+      <PlainLink to={to}>
         <Card>
           <CardActionArea>
             <CardContent>
@@ -40,12 +32,12 @@ const FunctionButton: React.FC<FunctionButtonProps> = ({
             </CardContent>
           </CardActionArea>
         </Card>
-      </Link>
+      </PlainLink>
     </Grid>
   );
 };
 
-const Home: React.FC = () => {
+const Home = () => {
   return (
     <Grid container spacing={2}>
       <FunctionButton
