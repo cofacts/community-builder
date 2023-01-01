@@ -20,8 +20,7 @@ const BigNumSetup = () => {
     e.preventDefault();
     const query = new URLSearchParams(
       // FIXME: bug in URLSearchParams type (https://github.com/Microsoft/TypeScript/issues/30584)
-      //
-      new FormData(e.currentTarget) as any
+      new FormData(e.currentTarget) as URLSearchParams
     ).toString();
 
     navigate('/bignum?' + query);
