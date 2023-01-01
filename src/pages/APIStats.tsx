@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLoadApiStatsQuery } from '../types';
+import { ListArticleFilter, useLoadApiStatsQuery } from '../types';
 import { getThousandSep } from '../lib/util';
 
 import CircularProgress from '@mui/material/CircularProgress';
@@ -8,8 +8,6 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-
-const POLLING_INTERVAL = 5000;
 
 type StatItemProps = {
   name: string;
@@ -31,9 +29,19 @@ const StatItem = ({ name, value }: StatItemProps) => {
   );
 };
 
-const APIStats = () => {
+const APIStatsOfFilter = ({ filter }: { filter: ListArticleFilter }) => {
   const { data, loading } = useLoadApiStatsQuery({
-    pollInterval: POLLING_INTERVAL,
+    variables: {
+      allArticleFilter: filter,
+      allRepliedArticlesFilter: {
+        ...filter,
+        replyCount: { GTE: 1 },
+      },
+      articlesHasUsefulRepliesFilter: {
+        ...filter,
+        hasArticleReplyWithMorePositiveFeedback: true,
+      },
+    },
   });
 
   if (loading) {
@@ -60,6 +68,12 @@ const APIStats = () => {
       />
     </Grid>
   );
+};
+
+const APIStats = () => {
+  const filter = {};
+
+  return <APIStatsOfFilter filter={filter} />;
 };
 
 export default APIStats;

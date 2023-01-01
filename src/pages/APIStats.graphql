@@ -1,12 +1,16 @@
-query LoadAPIStats {
-  allArticles: ListArticles {
+query LoadAPIStats(
+  $allArticleFilter: ListArticleFilter
+  $allRepliedArticlesFilter: ListArticleFilter
+  $articlesHasUsefulRepliesFilter: ListArticleFilter
+) {
+  allArticles: ListArticles(filter: $allArticleFilter) {
     totalCount
   }
-  allRepliedArticles: ListArticles(filter: { replyCount: { GTE: 1 } }) {
+  allRepliedArticles: ListArticles(filter: $allRepliedArticlesFilter) {
     totalCount
   }
   articlesHasUsefulReplies: ListArticles(
-    filter: { hasArticleReplyWithMorePositiveFeedback: true }
+    filter: $articlesHasUsefulRepliesFilter
   ) {
     totalCount
   }
