@@ -2,6 +2,7 @@
   "name": "community-builder",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://cofacts.github.io/community-builder",
   "dependencies": {
     "@apollo/client": "^3.7.1",
     "@emotion/css": "^11.10.5",
