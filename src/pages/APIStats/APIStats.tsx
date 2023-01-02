@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 
 import {
   ListArticleFilter,
@@ -127,6 +128,17 @@ const APIStats = () => {
                 <KeyboardArrowDownOutlinedIcon />
               </IconButton>
             )}
+            <IconButton
+              onClick={() => {
+                setFilters((fs) => [
+                  ...fs.slice(0, idx + 1),
+                  filter,
+                  ...fs.slice(idx + 1),
+                ]);
+              }}
+            >
+              <ContentCopyOutlinedIcon />
+            </IconButton>
             <IconButton
               onClick={() => {
                 setFilters((fs) => fs.filter((_, i) => i !== idx));
