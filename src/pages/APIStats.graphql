@@ -1,9 +1,10 @@
 query LoadAPIStats(
+  $isRepliedOnly: Boolean!
   $allArticleFilter: ListArticleFilter
-  $allRepliedArticlesFilter: ListArticleFilter
-  $articlesHasUsefulRepliesFilter: ListArticleFilter
+  $allRepliedArticlesFilter: ListArticleFilter!
+  $articlesHasUsefulRepliesFilter: ListArticleFilter!
 ) {
-  allArticles: ListArticles(filter: $allArticleFilter) {
+  allArticles: ListArticles(filter: $allArticleFilter) @skip(if: $isRepliedOnly) {
     totalCount
   }
   allRepliedArticles: ListArticles(filter: $allRepliedArticlesFilter) {

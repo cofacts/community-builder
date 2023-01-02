@@ -1203,9 +1203,10 @@ export type ValidationResult = {
 };
 
 export type LoadApiStatsQueryVariables = Exact<{
+  isRepliedOnly: Scalars['Boolean'];
   allArticleFilter?: InputMaybe<ListArticleFilter>;
-  allRepliedArticlesFilter?: InputMaybe<ListArticleFilter>;
-  articlesHasUsefulRepliesFilter?: InputMaybe<ListArticleFilter>;
+  allRepliedArticlesFilter: ListArticleFilter;
+  articlesHasUsefulRepliesFilter: ListArticleFilter;
 }>;
 
 
@@ -1299,8 +1300,8 @@ export type ReplyListInReplyTableQuery = { readonly __typename?: 'Query', readon
 
 
 export const LoadApiStatsDocument = gql`
-    query LoadAPIStats($allArticleFilter: ListArticleFilter, $allRepliedArticlesFilter: ListArticleFilter, $articlesHasUsefulRepliesFilter: ListArticleFilter) {
-  allArticles: ListArticles(filter: $allArticleFilter) {
+    query LoadAPIStats($isRepliedOnly: Boolean!, $allArticleFilter: ListArticleFilter, $allRepliedArticlesFilter: ListArticleFilter!, $articlesHasUsefulRepliesFilter: ListArticleFilter!) {
+  allArticles: ListArticles(filter: $allArticleFilter) @skip(if: $isRepliedOnly) {
     totalCount
   }
   allRepliedArticles: ListArticles(filter: $allRepliedArticlesFilter) {
@@ -1324,13 +1325,14 @@ export const LoadApiStatsDocument = gql`
  * @example
  * const { data, loading, error } = useLoadApiStatsQuery({
  *   variables: {
+ *      isRepliedOnly: // value for 'isRepliedOnly'
  *      allArticleFilter: // value for 'allArticleFilter'
  *      allRepliedArticlesFilter: // value for 'allRepliedArticlesFilter'
  *      articlesHasUsefulRepliesFilter: // value for 'articlesHasUsefulRepliesFilter'
  *   },
  * });
  */
-export function useLoadApiStatsQuery(baseOptions?: Apollo.QueryHookOptions<LoadApiStatsQuery, LoadApiStatsQueryVariables>) {
+export function useLoadApiStatsQuery(baseOptions: Apollo.QueryHookOptions<LoadApiStatsQuery, LoadApiStatsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<LoadApiStatsQuery, LoadApiStatsQueryVariables>(LoadApiStatsDocument, options);
       }
