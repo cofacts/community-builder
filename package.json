@@ -5,6 +5,7 @@
   "homepage": "https://cofacts.github.io/community-builder",
   "dependencies": {
     "@apollo/client": "^3.7.1",
+    "@elastic/datemath": "^5.0.3",
     "@emotion/css": "^11.10.5",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",

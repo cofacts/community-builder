@@ -7,8 +7,14 @@ import {
   useListAllCategoriesQuery,
   ListAllCategoriesQuery,
   ListAllCategoriesDocument,
+  ArticleTypeEnum,
 } from '../types';
-import { getThousandSep } from '../lib/util';
+import {
+  getThousandSep,
+  getTimeRangeString,
+  getArticleType,
+  rejectsNull,
+} from '../lib/util';
 
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -105,24 +111,46 @@ function FilterText({ filter }: { filter: ListArticleFilter }) {
 
   const names: string[] = [];
 
+  if (filter.createdAt) {
+    names.push(getTimeRangeString('created time', filter.createdAt));
+  }
+
+  if (filter.articleReply?.createdAt) {
+    names.push(
+      getTimeRangeString('replied time', filter.articleReply.createdAt)
+    );
+  }
+
   if (filter.categoryIds) {
     if (Object.keys(categoryIdToName).length === 0) {
       names.push('(Loading)');
     } else {
-      filter.categoryIds.forEach((id) => {
-        if (!id) return;
-        names.push(categoryIdToName[id] ?? id);
-      });
+      names.push(
+        filter.categoryIds
+          .filter(rejectsNull)
+          .map((id) => categoryIdToName[id] ?? id)
+          .join(' or ')
+      );
     }
   }
 
-  return <>{names.join(', ')}</>;
+  if (filter.articleTypes) {
+    names.push(
+      filter.articleTypes.filter(rejectsNull).map(getArticleType).join(' & ')
+    );
+  }
+
+  return <>{names.join(', ') || 'All'}</>;
 }
 
 const APIStats = () => {
   const filters: ListArticleFilter[] = [
     {},
     { categoryIds: ['covid19', 'intl'] },
+    {
+      createdAt: { GTE: '2022-01-01', LT: 'now' },
+      articleTypes: [ArticleTypeEnum.Image, ArticleTypeEnum.Video],
+    },
   ];
   useListAllCategoriesQuery();
 
