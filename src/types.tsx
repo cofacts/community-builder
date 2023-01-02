@@ -1211,6 +1211,11 @@ export type LoadApiStatsQueryVariables = Exact<{
 
 export type LoadApiStatsQuery = { readonly __typename?: 'Query', readonly allArticles?: { readonly __typename?: 'ArticleConnection', readonly totalCount: number } | null, readonly allRepliedArticles?: { readonly __typename?: 'ArticleConnection', readonly totalCount: number } | null, readonly articlesHasUsefulReplies?: { readonly __typename?: 'ArticleConnection', readonly totalCount: number } | null };
 
+export type ListAllCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ListAllCategoriesQuery = { readonly __typename?: 'Query', readonly ListCategories?: { readonly __typename?: 'ListCategoryConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ListCategoryConnectionEdge', readonly node: { readonly __typename?: 'Category', readonly id: string, readonly title?: string | null } }> } | null };
+
 export type BigNumOfRepliedQueryVariables = Exact<{
   startTime?: InputMaybe<Scalars['String']>;
 }>;
@@ -1336,6 +1341,45 @@ export function useLoadApiStatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type LoadApiStatsQueryHookResult = ReturnType<typeof useLoadApiStatsQuery>;
 export type LoadApiStatsLazyQueryHookResult = ReturnType<typeof useLoadApiStatsLazyQuery>;
 export type LoadApiStatsQueryResult = Apollo.QueryResult<LoadApiStatsQuery, LoadApiStatsQueryVariables>;
+export const ListAllCategoriesDocument = gql`
+    query ListAllCategories {
+  ListCategories(first: 50) {
+    edges {
+      node {
+        id
+        title
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useListAllCategoriesQuery__
+ *
+ * To run a query within a React component, call `useListAllCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useListAllCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useListAllCategoriesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useListAllCategoriesQuery(baseOptions?: Apollo.QueryHookOptions<ListAllCategoriesQuery, ListAllCategoriesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ListAllCategoriesQuery, ListAllCategoriesQueryVariables>(ListAllCategoriesDocument, options);
+      }
+export function useListAllCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ListAllCategoriesQuery, ListAllCategoriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ListAllCategoriesQuery, ListAllCategoriesQueryVariables>(ListAllCategoriesDocument, options);
+        }
+export type ListAllCategoriesQueryHookResult = ReturnType<typeof useListAllCategoriesQuery>;
+export type ListAllCategoriesLazyQueryHookResult = ReturnType<typeof useListAllCategoriesLazyQuery>;
+export type ListAllCategoriesQueryResult = Apollo.QueryResult<ListAllCategoriesQuery, ListAllCategoriesQueryVariables>;
 export const BigNumOfRepliedDocument = gql`
     query BigNumOfReplied($startTime: String) {
   query: ListArticles(filter: {repliedAt: {GTE: $startTime}}) {

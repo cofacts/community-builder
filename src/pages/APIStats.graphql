@@ -15,3 +15,16 @@ query LoadAPIStats(
     totalCount
   }
 }
+
+query ListAllCategories {
+  ListCategories (
+    first: 50
+  ) {
+    edges {
+      node {
+        id
+        title
+      }
+    }
+  }
+}
