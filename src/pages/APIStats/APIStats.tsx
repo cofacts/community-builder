@@ -1,10 +1,8 @@
-import React, { useMemo, useState } from 'react';
-import { useApolloClient } from '@apollo/client';
+import React, { useState } from 'react';
 
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Drawer from '@mui/material/Drawer';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
@@ -15,97 +13,12 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import {
   ListArticleFilter,
   useListAllCategoriesQuery,
-  ListAllCategoriesQuery,
-  ListAllCategoriesDocument,
   ArticleTypeEnum,
 } from '../../types';
-import {
-  getTimeRangeString,
-  getArticleType,
-  rejectsNull,
-} from '../../lib/util';
 
 import APIStatsOfFilter from './APIStatsOfFilter';
-
-function FilterText({ filter }: { filter: ListArticleFilter }) {
-  const client = useApolloClient();
-  const allCategoryResults = client.readQuery<ListAllCategoriesQuery>({
-    query: ListAllCategoriesDocument,
-  });
-
-  const categoryIdToName = useMemo(
-    () =>
-      (allCategoryResults?.ListCategories?.edges ?? []).reduce<{
-        [id: string]: string;
-      }>((agg, { node }) => {
-        if (node.id && node.title) {
-          agg[node.id] = node.title;
-        }
-        return agg;
-      }, {}),
-    [allCategoryResults]
-  );
-
-  const names: string[] = [];
-
-  if (filter.createdAt) {
-    names.push(getTimeRangeString('created time', filter.createdAt));
-  }
-
-  if (filter.articleReply?.createdAt) {
-    names.push(
-      getTimeRangeString('replied time', filter.articleReply.createdAt)
-    );
-  }
-
-  if (filter.categoryIds) {
-    if (Object.keys(categoryIdToName).length === 0) {
-      names.push('(Loading)');
-    } else {
-      names.push(
-        filter.categoryIds
-          .filter(rejectsNull)
-          .map((id) => categoryIdToName[id] ?? id)
-          .join(' or ')
-      );
-    }
-  }
-
-  if (filter.articleTypes) {
-    names.push(
-      filter.articleTypes.filter(rejectsNull).map(getArticleType).join(' & ')
-    );
-  }
-
-  return <>{names.join(', ') || 'All'}</>;
-}
-
-const FilterEditor = ({
-  filter,
-  onSubmit,
-}: {
-  filter: ListArticleFilter;
-  onSubmit: (filter: ListArticleFilter) => void;
-}) => {
-  const [currentFilter, setCurrentFilter] = useState(filter);
-
-  return (
-    <form
-      style={{ display: 'flex', flexFlow: 'column', height: '100%' }}
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSubmit(currentFilter);
-      }}
-    >
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
-        Form content here
-      </div>
-      <Button variant="contained" type="submit" sx={{ m: 1 }}>
-        Submit
-      </Button>
-    </form>
-  );
-};
+import FilterText from './FilterText';
+import FilterEditor from './FilterEditor';
 
 const APIStats = () => {
   useListAllCategoriesQuery();
@@ -115,11 +28,13 @@ const APIStats = () => {
     {},
     { categoryIds: ['covid19', 'intl'] },
     {
-      createdAt: { GTE: '2022-01-01', LT: 'now' },
+      createdAt: { GTE: '2022-01-01', LTE: 'now' },
       articleTypes: [ArticleTypeEnum.Image, ArticleTypeEnum.Video],
     },
     {
-      articleReply: { createdAt: { GTE: '2022-01-01', LT: '2022-01-01||+1M' } },
+      articleReply: {
+        createdAt: { GTE: '2022-01-01', LTE: '2022-01-01||+1M' },
+      },
     },
   ]);
 
