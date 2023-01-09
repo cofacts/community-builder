@@ -6,7 +6,6 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import TextField from '@mui/material/TextField';
 
 import {
   ListArticleFilter,
@@ -15,6 +14,7 @@ import {
 } from '../../types';
 
 import FilterText from './FilterText';
+import DateTimePicker from '../../components/DateTimePicker';
 
 // https://stackoverflow.com/a/58633651
 const localDateFormatter = new Intl.DateTimeFormat('sv', {
@@ -61,28 +61,22 @@ const FilterEditor = ({
           <AccordionDetails
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
-            <TextField
-              label="From"
-              type="datetime-local"
-              InputLabelProps={{ shrink: true }}
-              value={formatDate(currentFilter.createdAt?.GTE ?? '')}
-              onChange={(e) =>
+            <DateTimePicker
+              value={currentFilter.createdAt?.LTE ?? ''}
+              onChange={(value) =>
                 setCurrentFilter((f) => ({
                   ...f,
-                  createdAt: { ...f.createdAt, GTE: e.currentTarget.value },
+                  createdAt: { ...f.createdAt, LTE: value },
                 }))
               }
             />{' '}
             ~{' '}
-            <TextField
-              label="To"
-              type="datetime-local"
-              InputLabelProps={{ shrink: true }}
-              value={formatDate(currentFilter.createdAt?.LTE ?? '')}
-              onChange={(e) =>
+            <DateTimePicker
+              value={currentFilter.createdAt?.LTE ?? ''}
+              onChange={(value) =>
                 setCurrentFilter((f) => ({
                   ...f,
-                  createdAt: { ...f.createdAt, LTE: e.currentTarget.value },
+                  createdAt: { ...f.createdAt, LTE: value },
                 }))
               }
             />
