@@ -16,19 +16,6 @@ import {
 import FilterText from './FilterText';
 import DateTimePicker from '../../components/DateTimePicker';
 
-// https://stackoverflow.com/a/58633651
-const localDateFormatter = new Intl.DateTimeFormat('sv', {
-  timeStyle: 'medium',
-  dateStyle: 'short',
-});
-function formatDate(dateStr: string) {
-  try {
-    return localDateFormatter.format(new Date(dateStr)).replace(' ', 'T');
-  } catch (e) {
-    return '';
-  }
-}
-
 const FilterEditor = ({
   filter,
   onSubmit,
