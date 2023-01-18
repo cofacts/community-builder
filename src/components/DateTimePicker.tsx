@@ -1,5 +1,4 @@
 import React from 'react';
-import dateMath from '@elastic/datemath';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 
@@ -9,19 +8,6 @@ type Props = {
 };
 
 const CUSTOM = '_CUSTOM_' as const;
-
-// https://stackoverflow.com/a/58633651
-const localDateFormatter = new Intl.DateTimeFormat('sv', {
-  timeStyle: 'medium',
-  dateStyle: 'short',
-});
-function formatDate(dateStr: string) {
-  try {
-    return localDateFormatter.format(new Date(dateStr)).replace(' ', 'T');
-  } catch (e) {
-    return '';
-  }
-}
 
 function DateTimePicker({ value, onChange }: Props) {
   const selectValue = value.startsWith('now') ? value : CUSTOM;
@@ -37,9 +23,7 @@ function DateTimePicker({ value, onChange }: Props) {
             return onChange(new Date().toISOString());
           }
 
-          const dateMoment = dateMath.parse(value);
-          if (!dateMoment) return;
-          onChange(dateMoment.toDate().toISOString());
+          onChange(value);
         }}
       >
         <MenuItem value="now">Now</MenuItem>

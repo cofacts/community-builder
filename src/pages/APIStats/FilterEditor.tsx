@@ -49,11 +49,11 @@ const FilterEditor = ({
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <DateTimePicker
-              value={currentFilter.createdAt?.LTE ?? ''}
+              value={currentFilter.createdAt?.GTE ?? ''}
               onChange={(value) =>
                 setCurrentFilter((f) => ({
                   ...f,
-                  createdAt: { ...f.createdAt, LTE: value },
+                  createdAt: { ...f.createdAt, GTE: value },
                 }))
               }
             />{' '}
