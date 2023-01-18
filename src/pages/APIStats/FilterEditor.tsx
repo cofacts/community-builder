@@ -33,15 +33,6 @@ const FilterEditor = ({
     query: ListAllCategoriesDocument,
   });
 
-  const handleArticleTypeCheck = (value: ArticleTypeEnum) => {
-    setCurrentFilter((f) => ({
-      ...f,
-      articleTypes: f.articleTypes?.includes(value)
-        ? f.articleTypes.filter((t) => t !== value)
-        : [...(f.articleTypes ?? []), value],
-    }));
-  };
-
   return (
     <form
       style={{ display: 'flex', flexFlow: 'column', height: '100%' }}
@@ -108,12 +99,56 @@ const FilterEditor = ({
                     <Checkbox
                       value={value}
                       checked={currentFilter.articleTypes?.includes(value)}
-                      onChange={() => handleArticleTypeCheck(value)}
+                      onChange={() => {
+                        setCurrentFilter((f) => ({
+                          ...f,
+                          articleTypes: f.articleTypes?.includes(value)
+                            ? f.articleTypes.filter((t) => t !== value)
+                            : [...(f.articleTypes ?? []), value],
+                        }));
+                      }}
                     />
                   }
                   label={value}
                 />
               ))}
+            </FormGroup>
+          </AccordionDetails>
+        </Accordion>
+
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography>Topic</Typography>
+            <Typography sx={{ color: 'text.secondary', ml: 2 }}>
+              <FilterText filter={{ categoryIds: currentFilter.categoryIds }} />
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+          >
+            <FormGroup>
+              {(allCategoryResults?.ListCategories?.edges ?? []).map(
+                ({ node: { id, title } }) => (
+                  <FormControlLabel
+                    key={id}
+                    control={
+                      <Checkbox
+                        value={id}
+                        checked={currentFilter.categoryIds?.includes(id)}
+                        onChange={() => {
+                          setCurrentFilter((f) => ({
+                            ...f,
+                            categoryIds: f.categoryIds?.includes(id)
+                              ? f.categoryIds.filter((i) => i !== id)
+                              : [...(f.categoryIds ?? []), id],
+                          }));
+                        }}
+                      />
+                    }
+                    label={title}
+                  />
+                )
+              )}
             </FormGroup>
           </AccordionDetails>
         </Accordion>
