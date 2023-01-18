@@ -96,62 +96,24 @@ const FilterEditor = ({
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    value={ArticleTypeEnum.Text}
-                    checked={currentFilter.articleTypes?.includes(
-                      ArticleTypeEnum.Text
-                    )}
-                    onChange={() =>
-                      handleArticleTypeCheck(ArticleTypeEnum.Text)
-                    }
-                  />
-                }
-                label="Text"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    value={ArticleTypeEnum.Video}
-                    checked={currentFilter.articleTypes?.includes(
-                      ArticleTypeEnum.Video
-                    )}
-                    onChange={() =>
-                      handleArticleTypeCheck(ArticleTypeEnum.Video)
-                    }
-                  />
-                }
-                label="Video"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    value={ArticleTypeEnum.Image}
-                    checked={currentFilter.articleTypes?.includes(
-                      ArticleTypeEnum.Image
-                    )}
-                    onChange={() =>
-                      handleArticleTypeCheck(ArticleTypeEnum.Image)
-                    }
-                  />
-                }
-                label="Image"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    value={ArticleTypeEnum.Audio}
-                    checked={currentFilter.articleTypes?.includes(
-                      ArticleTypeEnum.Audio
-                    )}
-                    onChange={() =>
-                      handleArticleTypeCheck(ArticleTypeEnum.Audio)
-                    }
-                  />
-                }
-                label="Audio"
-              />
+              {[
+                ArticleTypeEnum.Text,
+                ArticleTypeEnum.Video,
+                ArticleTypeEnum.Image,
+                ArticleTypeEnum.Audio,
+              ].map((value) => (
+                <FormControlLabel
+                  key={value}
+                  control={
+                    <Checkbox
+                      value={value}
+                      checked={currentFilter.articleTypes?.includes(value)}
+                      onChange={() => handleArticleTypeCheck(value)}
+                    />
+                  }
+                  label={value}
+                />
+              ))}
             </FormGroup>
           </AccordionDetails>
         </Accordion>
