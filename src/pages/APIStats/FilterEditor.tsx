@@ -69,6 +69,56 @@ const FilterEditor = ({
             />
           </AccordionDetails>
         </Accordion>
+
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography>Replied time</Typography>
+            <Typography sx={{ color: 'text.secondary', ml: 2 }}>
+              <FilterText
+                filter={{
+                  articleReply: {
+                    createdAt: currentFilter.articleReply?.createdAt,
+                  },
+                }}
+              />
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+          >
+            <DateTimePicker
+              value={currentFilter.articleReply?.createdAt?.GTE ?? ''}
+              onChange={(value) =>
+                setCurrentFilter((f) => ({
+                  ...f,
+                  articleReply: {
+                    ...f.articleReply,
+                    createdAt: {
+                      ...f.articleReply?.createdAt,
+                      GTE: value,
+                    },
+                  },
+                }))
+              }
+            />{' '}
+            ~{' '}
+            <DateTimePicker
+              value={currentFilter.articleReply?.createdAt?.LTE ?? ''}
+              onChange={(value) =>
+                setCurrentFilter((f) => ({
+                  ...f,
+                  articleReply: {
+                    ...f.articleReply,
+                    createdAt: {
+                      ...f.articleReply?.createdAt,
+                      LTE: value,
+                    },
+                  },
+                }))
+              }
+            />
+          </AccordionDetails>
+        </Accordion>
       </div>
       <Button variant="contained" type="submit" sx={{ m: 1 }}>
         Submit
