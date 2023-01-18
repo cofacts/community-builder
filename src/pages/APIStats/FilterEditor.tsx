@@ -6,11 +6,15 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 import {
   ListArticleFilter,
   ListAllCategoriesQuery,
   ListAllCategoriesDocument,
+  ArticleTypeEnum,
 } from '../../types';
 
 import FilterText from './FilterText';
@@ -28,6 +32,15 @@ const FilterEditor = ({
   const allCategoryResults = client.readQuery<ListAllCategoriesQuery>({
     query: ListAllCategoriesDocument,
   });
+
+  const handleArticleTypeCheck = (value: ArticleTypeEnum) => {
+    setCurrentFilter((f) => ({
+      ...f,
+      articleTypes: f.articleTypes?.includes(value)
+        ? f.articleTypes.filter((t) => t !== value)
+        : [...(f.articleTypes ?? []), value],
+    }));
+  };
 
   return (
     <form
@@ -67,6 +80,79 @@ const FilterEditor = ({
                 }))
               }
             />
+          </AccordionDetails>
+        </Accordion>
+
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography>Type</Typography>
+            <Typography sx={{ color: 'text.secondary', ml: 2 }}>
+              <FilterText
+                filter={{ articleTypes: currentFilter.articleTypes }}
+              />
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+          >
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    value={ArticleTypeEnum.Text}
+                    checked={currentFilter.articleTypes?.includes(
+                      ArticleTypeEnum.Text
+                    )}
+                    onChange={() =>
+                      handleArticleTypeCheck(ArticleTypeEnum.Text)
+                    }
+                  />
+                }
+                label="Text"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    value={ArticleTypeEnum.Video}
+                    checked={currentFilter.articleTypes?.includes(
+                      ArticleTypeEnum.Video
+                    )}
+                    onChange={() =>
+                      handleArticleTypeCheck(ArticleTypeEnum.Video)
+                    }
+                  />
+                }
+                label="Video"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    value={ArticleTypeEnum.Image}
+                    checked={currentFilter.articleTypes?.includes(
+                      ArticleTypeEnum.Image
+                    )}
+                    onChange={() =>
+                      handleArticleTypeCheck(ArticleTypeEnum.Image)
+                    }
+                  />
+                }
+                label="Image"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    value={ArticleTypeEnum.Audio}
+                    checked={currentFilter.articleTypes?.includes(
+                      ArticleTypeEnum.Audio
+                    )}
+                    onChange={() =>
+                      handleArticleTypeCheck(ArticleTypeEnum.Audio)
+                    }
+                  />
+                }
+                label="Audio"
+              />
+            </FormGroup>
           </AccordionDetails>
         </Accordion>
 
