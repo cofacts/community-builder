@@ -108,7 +108,9 @@ const FilterEditor = ({
                   control={
                     <Checkbox
                       value={value}
-                      checked={currentFilter.articleTypes?.includes(value)}
+                      checked={
+                        currentFilter.articleTypes?.includes(value) ?? false
+                      }
                       onChange={() => {
                         setCurrentFilter((f) => ({
                           ...f,
@@ -144,7 +146,9 @@ const FilterEditor = ({
                     control={
                       <Checkbox
                         value={id}
-                        checked={currentFilter.categoryIds?.includes(id)}
+                        checked={
+                          currentFilter.categoryIds?.includes(id) ?? false
+                        }
                         onChange={() => {
                           setCurrentFilter((f) => ({
                             ...f,
@@ -180,7 +184,7 @@ const FilterEditor = ({
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <DateTimePicker
-              value={currentFilter.articleReply?.createdAt?.GTE ?? ''}
+              value={currentFilter.articleReply?.createdAt?.GTE ?? undefined}
               onChange={(value) =>
                 setCurrentFilter((f) => ({
                   ...f,
@@ -196,7 +200,7 @@ const FilterEditor = ({
             />{' '}
             ~{' '}
             <DateTimePicker
-              value={currentFilter.articleReply?.createdAt?.LTE ?? ''}
+              value={currentFilter.articleReply?.createdAt?.LTE ?? undefined}
               onChange={(value) =>
                 setCurrentFilter((f) => ({
                   ...f,
