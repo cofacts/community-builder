@@ -1,4 +1,5 @@
 import dateMath from '@elastic/datemath';
+import produce from 'immer';
 
 import { TimeRangeInput, ArticleTypeEnum } from '../types';
 
@@ -76,4 +77,27 @@ export function getArticleType(articleTypeEnum: ArticleTypeEnum) {
 
 export function rejectsNull<T>(maybe: T | null): maybe is T {
   return maybe !== null;
+}
+
+function isEmptyFilter(v: unknown): boolean {
+  if (v === undefined || v === null) return true;
+  if (typeof v !== 'object') return false;
+  return Object.keys(v).length === 0;
+}
+
+function isTraversable(v: unknown): v is { [key: string]: unknown } {
+  return typeof v === 'object' && v !== null;
+}
+
+export function cleanupFilterObj(kv: { [key: string]: unknown }) {
+  return produce(kv, (draftKv) => {
+    for (const [key, value] of Object.entries(draftKv)) {
+      if (isTraversable(value)) {
+        draftKv[key] = cleanupFilterObj(value);
+      }
+      if (isEmptyFilter(draftKv[key])) {
+        delete draftKv[key];
+      }
+    }
+  });
 }

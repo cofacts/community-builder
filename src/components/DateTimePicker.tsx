@@ -3,14 +3,16 @@ import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 
 type Props = {
-  value: string;
-  onChange: (newValue: string) => void;
+  value: string | undefined;
+  onChange: (newValue: string | undefined) => void;
 };
 
+const EMPTY = '_EMPTY_' as const;
 const CUSTOM = '_CUSTOM_' as const;
 
 function DateTimePicker({ value, onChange }: Props) {
-  const selectValue = value.startsWith('now') ? value : CUSTOM;
+  const selectValue =
+    value === undefined ? EMPTY : value.startsWith('now') ? value : CUSTOM;
 
   return (
     <>
@@ -19,13 +21,17 @@ function DateTimePicker({ value, onChange }: Props) {
         value={selectValue}
         onChange={(e) => {
           const { value } = e.target;
-          if (value === CUSTOM) {
-            return onChange(new Date().toISOString());
+          switch (value) {
+            case EMPTY:
+              return onChange(undefined);
+            case CUSTOM:
+              return onChange(new Date().toISOString());
+            default:
+              return onChange(value);
           }
-
-          onChange(value);
         }}
       >
+        <MenuItem value={EMPTY}>(Not set)</MenuItem>
         <MenuItem value="now">Now</MenuItem>
         <MenuItem value="now-1d">1 day ago</MenuItem>
         <MenuItem value="now-2d">2 days ago</MenuItem>

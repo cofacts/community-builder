@@ -19,6 +19,7 @@ import {
 
 import FilterText from './FilterText';
 import DateTimePicker from '../../components/DateTimePicker';
+import { cleanupFilterObj } from '../../lib/util';
 
 const FilterEditor = ({
   filter,
@@ -27,11 +28,17 @@ const FilterEditor = ({
   filter: ListArticleFilter;
   onSubmit: (filter: ListArticleFilter) => void;
 }) => {
-  const [currentFilter, setCurrentFilter] = useState(filter);
+  const [currentFilter, rawSetCurrentFilter] = useState(filter);
   const client = useApolloClient();
   const allCategoryResults = client.readQuery<ListAllCategoriesQuery>({
     query: ListAllCategoriesDocument,
   });
+
+  const setCurrentFilter = (
+    cb: (v: ListArticleFilter) => ListArticleFilter
+  ) => {
+    rawSetCurrentFilter((f) => cleanupFilterObj(cb(f)));
+  };
 
   return (
     <form
@@ -53,17 +60,20 @@ const FilterEditor = ({
             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <DateTimePicker
-              value={currentFilter.createdAt?.GTE ?? ''}
+              value={currentFilter.createdAt?.GTE ?? undefined}
               onChange={(value) =>
                 setCurrentFilter((f) => ({
                   ...f,
-                  createdAt: { ...f.createdAt, GTE: value },
+                  createdAt: {
+                    ...f.createdAt,
+                    GTE: value,
+                  },
                 }))
               }
             />{' '}
             ~{' '}
             <DateTimePicker
-              value={currentFilter.createdAt?.LTE ?? ''}
+              value={currentFilter.createdAt?.LTE ?? undefined}
               onChange={(value) =>
                 setCurrentFilter((f) => ({
                   ...f,
