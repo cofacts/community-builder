@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import URLON from 'urlon';
 
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
@@ -10,33 +12,32 @@ import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDown
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
-import {
-  ListArticleFilter,
-  useListAllCategoriesQuery,
-  ArticleTypeEnum,
-} from '../../types';
+import { ListArticleFilter, useListAllCategoriesQuery } from '../../types';
 
 import APIStatsOfFilter from './APIStatsOfFilter';
 import FilterText from './FilterText';
 import FilterEditor from './FilterEditor';
 
 const APIStats = () => {
+  const { search } = useLocation();
+  const navigate = useNavigate();
+
   useListAllCategoriesQuery();
   const [editingFilterIdx, setEditingFilterIdx] = useState<number>();
 
-  const [filters, setFilters] = useState<ListArticleFilter[]>(() => [
-    {},
-    { categoryIds: ['covid19', 'intl'] },
-    {
-      createdAt: { GTE: '2022-01-01', LTE: 'now' },
-      articleTypes: [ArticleTypeEnum.Image, ArticleTypeEnum.Video],
-    },
-    {
-      articleReply: {
-        createdAt: { GTE: '2022-01-01', LTE: '2022-01-01||+1M' },
-      },
-    },
-  ]);
+  const filters: ListArticleFilter[] = useMemo(() => {
+    try {
+      return URLON.parse(search.slice(1));
+    } catch {
+      return [{}];
+    }
+  }, [search]);
+
+  const setFilters = (cb: (v: ListArticleFilter[]) => ListArticleFilter[]) => {
+    const newFilters = cb(filters);
+
+    navigate(`/stats?${URLON.stringify(newFilters)}`);
+  };
 
   return (
     <>
