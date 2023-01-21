@@ -11,6 +11,8 @@ import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutl
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
 import { ListArticleFilter, useListAllCategoriesQuery } from '../../types';
 
@@ -121,6 +123,14 @@ const APIStats = () => {
           />
         )}
       </Drawer>
+      <Fab
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
+        color="primary"
+        aria-label="add"
+        onClick={() => setEditingFilterIdx(filters.length)}
+      >
+        <AddIcon />
+      </Fab>
     </>
   );
 };
