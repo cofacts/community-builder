@@ -11,6 +11,7 @@ import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutl
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import PercentIcon from '@mui/icons-material/Percent';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -25,7 +26,12 @@ const APIStats = () => {
   const navigate = useNavigate();
 
   useListAllCategoriesQuery();
+
+  /** If given, shows the FilterEditor with filters[editingFilterIdx] */
   const [editingFilterIdx, setEditingFilterIdx] = useState<number>();
+
+  /** If given, set filters[editingFilterIdx] to 100% and display % for all other filters */
+  const [baselineFilterIdx, setBaselineFilterIdx] = useState<number>();
 
   const filters: ListArticleFilter[] = useMemo(() => {
     try {
@@ -93,6 +99,14 @@ const APIStats = () => {
                 <ContentCopyOutlinedIcon />
               </IconButton>
               <IconButton
+                color={baselineFilterIdx === idx ? 'primary' : undefined}
+                onClick={() =>
+                  setBaselineFilterIdx((v) => (v === idx ? undefined : idx))
+                }
+              >
+                <PercentIcon />
+              </IconButton>
+              <IconButton
                 onClick={() => {
                   setFilters((fs) => fs.filter((_, i) => i !== idx));
                 }}
@@ -100,7 +114,12 @@ const APIStats = () => {
                 <DeleteOutlineOutlinedIcon />
               </IconButton>
             </Stack>
-            <APIStatsOfFilter filter={filter} />
+            <APIStatsOfFilter
+              filter={filter}
+              baselineFilter={
+                filters[baselineFilterIdx ?? -1 /* always returns undefined */]
+              }
+            />
           </div>
         ))}
       </Stack>

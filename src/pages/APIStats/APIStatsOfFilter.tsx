@@ -1,6 +1,13 @@
 import React from 'react';
 
-import { ListArticleFilter, useLoadApiStatsQuery } from '../../types';
+import { useApolloClient } from '@apollo/client';
+import {
+  ListArticleFilter,
+  useLoadApiStatsQuery,
+  LoadApiStatsQuery,
+  LoadApiStatsDocument,
+  LoadApiStatsQueryVariables,
+} from '../../types';
 import { getThousandSep } from '../../lib/util';
 
 import CircularProgress from '@mui/material/CircularProgress';
@@ -12,10 +19,11 @@ import CardContent from '@mui/material/CardContent';
 
 type StatItemProps = {
   name: string;
-  value: string;
+  value: number;
+  baseValue?: number;
 };
 
-const StatItem = ({ name, value }: StatItemProps) => {
+const StatItem = ({ name, value, baseValue }: StatItemProps) => {
   return (
     <Card sx={{ flex: 1 }}>
       <CardContent
@@ -27,27 +35,55 @@ const StatItem = ({ name, value }: StatItemProps) => {
         <Typography variant="body1" gutterBottom>
           {name}
         </Typography>
-        <Typography variant="h5">{value}</Typography>
+        <Typography
+          variant="h5"
+          sx={{ display: 'flex', alignItems: 'flex-end' }}
+        >
+          {getThousandSep(value)}
+          {baseValue !== undefined && (
+            <small style={{ marginLeft: 'auto' }}>
+              {Math.round((100 * value) / baseValue)}%
+            </small>
+          )}
+        </Typography>
       </CardContent>
     </Card>
   );
 };
 
-const APIStatsOfFilter = ({ filter }: { filter: ListArticleFilter }) => {
-  const { data, loading } = useLoadApiStatsQuery({
-    variables: {
-      isRepliedOnly: !!filter.articleReply,
-      allArticleFilter: filter,
-      allRepliedArticlesFilter: {
-        ...filter,
-        replyCount: { GTE: 1 },
-      },
-      articlesHasUsefulRepliesFilter: {
-        ...filter,
-        hasArticleReplyWithMorePositiveFeedback: true,
-      },
+function getVariables(filter: ListArticleFilter): LoadApiStatsQueryVariables {
+  return {
+    isRepliedOnly: !!filter.articleReply,
+    allArticleFilter: filter,
+    allRepliedArticlesFilter: {
+      ...filter,
+      replyCount: { GTE: 1 },
     },
+    articlesHasUsefulRepliesFilter: {
+      ...filter,
+      hasArticleReplyWithMorePositiveFeedback: true,
+    },
+  };
+}
+
+const APIStatsOfFilter = ({
+  filter,
+  baselineFilter,
+}: {
+  filter: ListArticleFilter;
+  baselineFilter: ListArticleFilter | undefined;
+}) => {
+  const { data, loading } = useLoadApiStatsQuery({
+    variables: getVariables(filter),
   });
+
+  const client = useApolloClient();
+  const baseline = baselineFilter
+    ? client.readQuery<LoadApiStatsQuery, LoadApiStatsQueryVariables>({
+        query: LoadApiStatsDocument,
+        variables: getVariables(baselineFilter),
+      })
+    : null;
 
   if (loading) {
     return (
@@ -62,16 +98,19 @@ const APIStatsOfFilter = ({ filter }: { filter: ListArticleFilter }) => {
       {data?.allArticles && (
         <StatItem
           name="All messages"
-          value={getThousandSep(data?.allArticles?.totalCount || 0)}
+          value={data?.allArticles?.totalCount || 0}
+          baseValue={baseline?.allArticles?.totalCount}
         />
       )}
       <StatItem
         name="Replied messages"
-        value={getThousandSep(data?.allRepliedArticles?.totalCount || 0)}
+        value={data?.allRepliedArticles?.totalCount || 0}
+        baseValue={baseline?.allRepliedArticles?.totalCount}
       />
       <StatItem
         name="Has useful replies"
-        value={getThousandSep(data?.articlesHasUsefulReplies?.totalCount || 0)}
+        value={data?.articlesHasUsefulReplies?.totalCount || 0}
+        baseValue={baseline?.articlesHasUsefulReplies?.totalCount}
       />
     </Stack>
   );
