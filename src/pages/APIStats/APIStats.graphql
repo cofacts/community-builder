@@ -1,0 +1,31 @@
+query LoadAPIStats(
+  $isRepliedOnly: Boolean!
+  $allArticleFilter: ListArticleFilter
+  $allRepliedArticlesFilter: ListArticleFilter!
+  $articlesHasUsefulRepliesFilter: ListArticleFilter!
+) {
+  allArticles: ListArticles(filter: $allArticleFilter) @skip(if: $isRepliedOnly) {
+    totalCount
+  }
+  allRepliedArticles: ListArticles(filter: $allRepliedArticlesFilter) {
+    totalCount
+  }
+  articlesHasUsefulReplies: ListArticles(
+    filter: $articlesHasUsefulRepliesFilter
+  ) {
+    totalCount
+  }
+}
+
+query ListAllCategories {
+  ListCategories (
+    first: 50
+  ) {
+    edges {
+      node {
+        id
+        title
+      }
+    }
+  }
+}
