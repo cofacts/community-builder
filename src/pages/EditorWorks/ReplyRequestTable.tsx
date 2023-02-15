@@ -92,6 +92,18 @@ const COLUMNS: GridColDef[] = [
                   ) : (
                     'Image'
                   );
+                case 'AUDIO':
+                  return (
+                    <Typography variant="body2" title={article.text || ''}>
+                      Audio
+                    </Typography>
+                  );
+                case 'VIDEO':
+                  return (
+                    <Typography variant="body2" title={article.text || ''}>
+                      Video
+                    </Typography>
+                  );
                 default:
                   return (
                     <Typography variant="body2" title={article.text || ''}>
