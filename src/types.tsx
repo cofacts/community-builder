@@ -1493,6 +1493,21 @@ export type ListAllCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type ListAllCategoriesQuery = { readonly __typename?: 'Query', readonly ListCategories?: { readonly __typename?: 'ListCategoryConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ListCategoryConnectionEdge', readonly node: { readonly __typename?: 'Category', readonly id: string, readonly title?: string | null } }> } | null };
 
+export type LoadAnalyticsStatsQueryVariables = Exact<{
+  filter?: InputMaybe<ListArticleFilter>;
+}>;
+
+
+export type LoadAnalyticsStatsQuery = { readonly __typename?: 'Query', readonly ListArticles?: { readonly __typename?: 'ArticleConnection', readonly totalCount: number, readonly pageInfo: { readonly __typename?: 'ArticleConnectionPageInfo', readonly firstCursor?: string | null, readonly lastCursor?: string | null } } | null };
+
+export type LoadAnalyticsQueryVariables = Exact<{
+  filter?: InputMaybe<ListArticleFilter>;
+  dateRange?: InputMaybe<TimeRangeInput>;
+}>;
+
+
+export type LoadAnalyticsQuery = { readonly __typename?: 'Query', readonly ListArticles?: { readonly __typename?: 'ArticleConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ArticleConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'Article', readonly id: string, readonly text?: string | null, readonly stats?: ReadonlyArray<{ readonly __typename?: 'Analytics', readonly date: string, readonly lineUser?: number | null, readonly lineVisit?: number | null, readonly webUser?: number | null, readonly webVisit?: number | null, readonly liff: ReadonlyArray<{ readonly __typename?: 'AnalyticsLiffEntry', readonly source: string, readonly user: number, readonly visit: number }> } | null> | null } }> } | null };
+
 export type BigNumOfRepliedQueryVariables = Exact<{
   startTime?: InputMaybe<Scalars['String']>;
 }>;
@@ -1658,6 +1673,99 @@ export function useListAllCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHook
 export type ListAllCategoriesQueryHookResult = ReturnType<typeof useListAllCategoriesQuery>;
 export type ListAllCategoriesLazyQueryHookResult = ReturnType<typeof useListAllCategoriesLazyQuery>;
 export type ListAllCategoriesQueryResult = Apollo.QueryResult<ListAllCategoriesQuery, ListAllCategoriesQueryVariables>;
+export const LoadAnalyticsStatsDocument = gql`
+    query LoadAnalyticsStats($filter: ListArticleFilter) {
+  ListArticles(filter: $filter) {
+    totalCount
+    pageInfo {
+      firstCursor
+      lastCursor
+    }
+  }
+}
+    `;
+
+/**
+ * __useLoadAnalyticsStatsQuery__
+ *
+ * To run a query within a React component, call `useLoadAnalyticsStatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLoadAnalyticsStatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLoadAnalyticsStatsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useLoadAnalyticsStatsQuery(baseOptions?: Apollo.QueryHookOptions<LoadAnalyticsStatsQuery, LoadAnalyticsStatsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LoadAnalyticsStatsQuery, LoadAnalyticsStatsQueryVariables>(LoadAnalyticsStatsDocument, options);
+      }
+export function useLoadAnalyticsStatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LoadAnalyticsStatsQuery, LoadAnalyticsStatsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LoadAnalyticsStatsQuery, LoadAnalyticsStatsQueryVariables>(LoadAnalyticsStatsDocument, options);
+        }
+export type LoadAnalyticsStatsQueryHookResult = ReturnType<typeof useLoadAnalyticsStatsQuery>;
+export type LoadAnalyticsStatsLazyQueryHookResult = ReturnType<typeof useLoadAnalyticsStatsLazyQuery>;
+export type LoadAnalyticsStatsQueryResult = Apollo.QueryResult<LoadAnalyticsStatsQuery, LoadAnalyticsStatsQueryVariables>;
+export const LoadAnalyticsDocument = gql`
+    query LoadAnalytics($filter: ListArticleFilter, $dateRange: TimeRangeInput) {
+  ListArticles(filter: $filter, first: 25, orderBy: {createdAt: DESC}) {
+    edges {
+      cursor
+      node {
+        id
+        text
+        stats(dateRange: $dateRange) {
+          date
+          lineUser
+          lineVisit
+          webUser
+          webVisit
+          liff {
+            source
+            user
+            visit
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useLoadAnalyticsQuery__
+ *
+ * To run a query within a React component, call `useLoadAnalyticsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLoadAnalyticsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLoadAnalyticsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      dateRange: // value for 'dateRange'
+ *   },
+ * });
+ */
+export function useLoadAnalyticsQuery(baseOptions?: Apollo.QueryHookOptions<LoadAnalyticsQuery, LoadAnalyticsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LoadAnalyticsQuery, LoadAnalyticsQueryVariables>(LoadAnalyticsDocument, options);
+      }
+export function useLoadAnalyticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LoadAnalyticsQuery, LoadAnalyticsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LoadAnalyticsQuery, LoadAnalyticsQueryVariables>(LoadAnalyticsDocument, options);
+        }
+export type LoadAnalyticsQueryHookResult = ReturnType<typeof useLoadAnalyticsQuery>;
+export type LoadAnalyticsLazyQueryHookResult = ReturnType<typeof useLoadAnalyticsLazyQuery>;
+export type LoadAnalyticsQueryResult = Apollo.QueryResult<LoadAnalyticsQuery, LoadAnalyticsQueryVariables>;
 export const BigNumOfRepliedDocument = gql`
     query BigNumOfReplied($startTime: String) {
   query: ListArticles(filter: {repliedAt: {GTE: $startTime}}) {

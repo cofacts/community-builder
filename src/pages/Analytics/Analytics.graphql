@@ -1,0 +1,44 @@
+query LoadAnalyticsStats(
+  $filter: ListArticleFilter
+) {
+  ListArticles(
+    filter: $filter
+  ) {
+    totalCount
+    pageInfo {
+      firstCursor
+      lastCursor
+    }
+  }
+}
+
+query LoadAnalytics(
+  $filter: ListArticleFilter
+  $dateRange: TimeRangeInput
+) {
+  ListArticles(
+    filter: $filter
+    first: 25
+    orderBy: { createdAt: DESC }
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        text
+        stats(dateRange: $dateRange) {
+          date
+          lineUser
+          lineVisit
+          webUser
+          webVisit
+          liff {
+            source
+            user
+            visit
+          }
+        }
+      }
+    }
+  }
+}

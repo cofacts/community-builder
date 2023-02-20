@@ -60,6 +60,11 @@ const Home = () => {
         title="Big Numbers"
         description="Instant number display to project in meetups"
       />
+      <FunctionButton
+        to="/analytics"
+        title="Analytics"
+        description="Web and LINE visit of specified messages"
+      />
     </Grid>
   );
 };

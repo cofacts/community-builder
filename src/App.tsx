@@ -14,6 +14,7 @@ import NeedToCheck from './pages/NeedToCheck';
 import EditorWorks from './pages/EditorWorks';
 import BigNumSetup from './pages/BigNumSetup';
 import BigNum from './pages/BigNum';
+import Analytics from './pages/Analytics';
 
 const TitleLink = styled(Link)`
   color: inherit;
@@ -42,6 +43,7 @@ const App = () => {
           <Route path="/editorworks" element={<EditorWorks />} />
           <Route path="/bignum/setup" element={<BigNumSetup />} />
           <Route path="/bignum" element={<BigNum />} />
+          <Route path="/analytics" element={<Analytics />} />
         </Routes>
       </Container>
     </>
