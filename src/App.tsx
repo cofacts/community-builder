@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes, Link } from 'react-router-dom';
+import { Route, Routes, Link, Outlet } from 'react-router-dom';
 
 import styled from '@emotion/styled';
 import AppBar from '@mui/material/AppBar';
@@ -34,8 +34,15 @@ const App = () => {
           </TitleLink>
         </Toolbar>
       </AppBar>
-      <Container sx={{ mt: 2 }} maxWidth="lg">
-        <Routes>
+      <Routes>
+        <Route path="/analytics" element={<Analytics />} />
+        <Route
+          element={
+            <Container sx={{ mt: 2 }} maxWidth="lg">
+              <Outlet />
+            </Container>
+          }
+        >
           <Route path="/" element={<Home />} />
           <Route path="/stats" element={<APIStats />} />
           <Route path="/need-to-check/setup" element={<NeedToCheckSetup />} />
@@ -43,9 +50,8 @@ const App = () => {
           <Route path="/editorworks" element={<EditorWorks />} />
           <Route path="/bignum/setup" element={<BigNumSetup />} />
           <Route path="/bignum" element={<BigNum />} />
-          <Route path="/analytics" element={<Analytics />} />
-        </Routes>
-      </Container>
+        </Route>
+      </Routes>
     </>
   );
 };
