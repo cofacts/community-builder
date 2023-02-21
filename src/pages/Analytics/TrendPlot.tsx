@@ -1,11 +1,16 @@
 import React, { useRef, useMemo } from 'react';
 import styled from '@emotion/styled';
 import { scaleLinear, scaleTime } from 'd3-scale';
+import { line, curveMonotoneX } from 'd3-shape';
 import { extent, max } from 'd3-array';
 
 import { useSize } from '../../lib/util';
 
 import { LoadAnalyticsQuery } from '../../types';
+
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'short',
+});
 
 const ChartContainer = styled.div`
   position: relative;
@@ -13,6 +18,20 @@ const ChartContainer = styled.div`
     position: absolute;
   }
 `;
+
+const Axis = styled.div`
+  position: relative;
+  & > * {
+    position: absolute;
+  }
+`;
+
+const ChartLine = styled.path`
+  stroke-width: 2px;
+  fill: none;
+`;
+
+type Point = { web: number; line: number; date: Date };
 
 type Props = {
   articleEdges: NonNullable<LoadAnalyticsQuery['ListArticles']>['edges'];
@@ -67,17 +86,19 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
         ? 0
         : (tsRangeWithUndefined[1] - tsRangeWithUndefined[0]) / 86400;
 
+    const points: Point[] = Array.from(
+      Array(days + 1 /* consider both head and tail */)
+    ).map((_, i) => {
+      const ts = (tsRangeWithUndefined[0] ?? 0) + i * 86400;
+      const date = new Date(ts * 1000);
+      const statOfTheDay = unixTsToDataMap.get(ts);
+      return statOfTheDay
+        ? { date, ...statOfTheDay }
+        : { date, web: 0, line: 0 };
+    });
+
     return [
-      Array.from(Array(days + 1 /* consider both head and tail */)).map(
-        (_, i) => {
-          const ts = (tsRangeWithUndefined[0] ?? 0) + i * 86400;
-          const date = new Date(ts * 1000);
-          const statOfTheDay = unixTsToDataMap.get(ts);
-          return statOfTheDay
-            ? { date, ...statOfTheDay }
-            : { date, web: 0, line: 0 };
-        }
-      ),
+      points,
       timeRange,
       max(entries.map(([, { web }]) => web)) ?? 0,
       max(entries.map(([, { line }]) => line)) ?? 0,
@@ -88,17 +109,46 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
   const xScale = scaleTime()
     .domain(timeRange)
     .range([0, sizeProps?.width ?? 0]);
-
-  console.log('ticks', xScale.ticks());
-  console.log({ points });
+  const webScale = scaleLinear()
+    .domain([0, maxWebVisit])
+    .range([sizeProps?.height ?? 0, 0]);
+  const webLineFn = line<Point>(
+    (p) => xScale(p.date),
+    (p) => webScale(p.web)
+  ).curve(curveMonotoneX);
+  const lineScale = scaleLinear()
+    .domain([0, maxLineVisit])
+    .range([sizeProps?.height ?? 0, 0]);
+  const lineLineFn = line<Point>(
+    (p) => xScale(p.date),
+    (p) => lineScale(p.line)
+  ).curve(curveMonotoneX);
 
   return (
     <ChartContainer ref={chartContainerRef} {...containerProps}>
       {sizeProps && (
-        <svg viewBox={`0 0 ${sizeProps.width} ${sizeProps.height}`}></svg>
+        <svg viewBox={`0 0 ${sizeProps.width} ${sizeProps.height}`}>
+          <ChartLine d={webLineFn(points) ?? ''} stroke="blue" />
+          <ChartLine d={lineLineFn(points) ?? ''} stroke="green" />
+        </svg>
       )}
       <div>Y axis</div>
-      <div>X axis</div>
+
+      {/* X-axis */}
+      <Axis style={{ width: '100%', bottom: 0 }}>
+        {xScale.ticks().map((date, i) => (
+          <span
+            style={{
+              left: xScale(date),
+              bottom: 0,
+              transform: 'translateX(-50%)',
+            }}
+            key={i}
+          >
+            {dateFormatter.format(date)}
+          </span>
+        ))}
+      </Axis>
     </ChartContainer>
   );
 }

@@ -19,7 +19,6 @@ function Analytics() {
 
   return (
     <>
-      <p>Data: {JSON.stringify(error || data)}</p>
       <TrendPlot articleEdges={articleEdges} style={{ height: 500 }} />
       <div style={{ height: 500 }}>
         <ArticlesTable articleEdges={articleEdges} />
