@@ -1,3 +1,5 @@
+#import "../../components/cells.graphql"
+
 query LoadAnalyticsStats(
   $filter: ListArticleFilter
 ) {
@@ -18,14 +20,15 @@ query LoadAnalytics(
 ) {
   ListArticles(
     filter: $filter
-    first: 25
+    first: 50
     orderBy: { createdAt: DESC }
   ) {
     edges {
       cursor
       node {
         id
-        text
+        ...ArticleCellFields
+        createdAt
         stats(dateRange: $dateRange) {
           date
           lineUser
