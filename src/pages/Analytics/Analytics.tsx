@@ -7,7 +7,10 @@ import { useLoadAnalyticsQuery } from '../../types';
 function Analytics() {
   const { data, error } = useLoadAnalyticsQuery({
     variables: {
-      filter: { ids: ['1ijttxdp31nsd', '250oafg9kzopp', '2xpltyroe0qbi'] },
+      // filter: { ids: ['1ijttxdp31nsd', '250oafg9kzopp', '2xpltyroe0qbi'] },
+      filter: {
+        ids: ['3orufkwgy9ier', '1jfbosave9lq8'],
+      },
       dateRange: { GTE: 'now-2M' },
     },
   });
