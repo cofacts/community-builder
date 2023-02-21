@@ -19,6 +19,9 @@
     "@types/node": "^16.18.4",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
+    "d3-array": "^3.2.2",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0",
     "graphql": "^16.6.0",
     "immer": "^9.0.18",
     "react": "^18.2.0",
@@ -99,6 +102,8 @@
     "@graphql-codegen/typescript": "^2.8.3",
     "@graphql-codegen/typescript-operations": "^2.5.8",
     "@graphql-codegen/typescript-react-apollo": "^3.3.7",
+    "@types/d3-array": "^3.0.4",
+    "@types/d3-scale": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint-config-prettier": "^8.5.0",
@@ -106,5 +111,6 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.0"
-  }
+  },
+  "proxy": "https://api.cofacts.tw"
 }
