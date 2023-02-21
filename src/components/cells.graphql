@@ -1,0 +1,6 @@
+fragment ArticleCellFields on Article {
+  id
+  articleType
+  attachmentUrl
+  text
+}
