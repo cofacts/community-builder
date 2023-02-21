@@ -1,3 +1,5 @@
+#import "../../components/cells.graphql"
+
 query ReplyRequestListStatInReplyRequestTable(
   $createdAt: TimeRangeInput
   $userId: String
@@ -38,10 +40,7 @@ query ReplyRequestListInReplyRequestTable(
           name
         }
         article {
-          id
-          text
-          articleType
-          attachmentUrl(variant: THUMBNAIL)
+          ...ArticleCellFields
         }
       }
     }

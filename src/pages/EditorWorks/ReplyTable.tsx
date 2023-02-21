@@ -1,8 +1,8 @@
 import React from 'react';
-import { styled } from '@mui/material/styles';
 import Link from '@mui/material/Link';
 import { Link as RRLink } from 'react-router-dom';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
+import { TextCell, Blocked } from '../../components/cells';
 import { GridColDef } from '@mui/x-data-grid';
 import { getSearchString, WorkType } from './util';
 
@@ -19,20 +19,6 @@ type User = NonNullable<
 type CreatedAt = NonNullable<
   ReplyListInReplyTableQuery['ListReplies']
 >['edges'][number]['node']['createdAt'];
-
-const TextCell = styled('div')({
-  width: '100%',
-  overflow: 'hidden',
-  display: '-webkit-box',
-  whiteSpace: 'normal',
-  lineHeight: 1.2,
-  '-webkit-box-orient': 'vertical',
-  '-webkit-line-clamp': 3,
-});
-
-const Blocked = styled('del')(({ theme }) => ({
-  color: theme.palette.grey[300],
-}));
 
 const COLUMNS: GridColDef[] = [
   {
