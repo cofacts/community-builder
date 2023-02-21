@@ -1,6 +1,7 @@
 import React from 'react';
 
 import ArticlesTable from './ArticlesTable';
+import TrendPlot from './TrendPlot';
 import { useLoadAnalyticsQuery } from '../../types';
 
 function Analytics() {
@@ -11,11 +12,14 @@ function Analytics() {
     },
   });
 
+  const articleEdges = data?.ListArticles?.edges ?? [];
+
   return (
     <>
       <p>Data: {JSON.stringify(error || data)}</p>
+      <TrendPlot articleEdges={articleEdges} style={{ height: 500 }} />
       <div style={{ height: 500 }}>
-        <ArticlesTable articleEdges={data?.ListArticles?.edges ?? []} />
+        <ArticlesTable articleEdges={articleEdges} />
       </div>
     </>
   );
