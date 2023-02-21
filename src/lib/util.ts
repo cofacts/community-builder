@@ -1,5 +1,6 @@
 import dateMath from '@elastic/datemath';
 import produce from 'immer';
+import React, { useState, useEffect } from 'react';
 
 import { TimeRangeInput, ArticleTypeEnum } from '../types';
 
@@ -100,4 +101,39 @@ export function cleanupFilterObj(kv: { [key: string]: unknown }) {
       }
     }
   });
+}
+
+/** Null when size is not available yet. */
+type UseSizeResult = {
+  width: number;
+  height: number;
+} | null;
+
+/**
+ * @param ref - The ref of HTML elements to measure the size
+ * @returns `width` and `height` of the content size of the specified element. `null` when not calculated yet.
+ */
+export function useSize(ref: React.RefObject<HTMLElement>): UseSizeResult {
+  const [result, setResult] = useState<UseSizeResult>(null);
+
+  useEffect(() => {
+    const elem = ref.current;
+
+    if (!elem) return;
+
+    const observer = new ResizeObserver((entries) => {
+      setResult({
+        width: entries[0].contentBoxSize[0].inlineSize,
+        height: entries[0].contentBoxSize[0].blockSize,
+      });
+    });
+
+    observer.observe(elem);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [ref]);
+
+  return result;
 }
