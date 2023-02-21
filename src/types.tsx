@@ -1477,6 +1477,7 @@ export type YdocVersion = {
   /** Binary that stores as base64 encoded string */
   readonly snapshot?: Maybe<Scalars['String']>;
 };
+export type ArticleCellFieldsFragment = { readonly __typename?: 'Article', readonly id: string, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly text?: string | null };
 
 export type LoadApiStatsQueryVariables = Exact<{
   isRepliedOnly: Scalars['Boolean'];
@@ -1506,7 +1507,7 @@ export type LoadAnalyticsQueryVariables = Exact<{
 }>;
 
 
-export type LoadAnalyticsQuery = { readonly __typename?: 'Query', readonly ListArticles?: { readonly __typename?: 'ArticleConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ArticleConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'Article', readonly id: string, readonly text?: string | null, readonly stats?: ReadonlyArray<{ readonly __typename?: 'Analytics', readonly date: string, readonly lineUser?: number | null, readonly lineVisit?: number | null, readonly webUser?: number | null, readonly webVisit?: number | null, readonly liff: ReadonlyArray<{ readonly __typename?: 'AnalyticsLiffEntry', readonly source: string, readonly user: number, readonly visit: number }> } | null> | null } }> } | null };
+export type LoadAnalyticsQuery = { readonly __typename?: 'Query', readonly ListArticles?: { readonly __typename?: 'ArticleConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ArticleConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'Article', readonly id: string, readonly createdAt?: string | null, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly text?: string | null, readonly stats?: ReadonlyArray<{ readonly __typename?: 'Analytics', readonly date: string, readonly lineUser?: number | null, readonly lineVisit?: number | null, readonly webUser?: number | null, readonly webVisit?: number | null, readonly liff: ReadonlyArray<{ readonly __typename?: 'AnalyticsLiffEntry', readonly source: string, readonly user: number, readonly visit: number }> } | null> | null } }> } | null };
 
 export type BigNumOfRepliedQueryVariables = Exact<{
   startTime?: InputMaybe<Scalars['String']>;
@@ -1569,7 +1570,7 @@ export type ReplyRequestListInReplyRequestTableQueryVariables = Exact<{
 }>;
 
 
-export type ReplyRequestListInReplyRequestTableQuery = { readonly __typename?: 'Query', readonly ListReplyRequests?: { readonly __typename?: 'ListReplyRequestConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ListReplyRequestConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'ReplyRequest', readonly id: string, readonly reason?: string | null, readonly updatedAt?: string | null, readonly user?: { readonly __typename?: 'User', readonly id: string, readonly name?: string | null } | null, readonly article: { readonly __typename?: 'Article', readonly id: string, readonly text?: string | null, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null } } }> } | null };
+export type ReplyRequestListInReplyRequestTableQuery = { readonly __typename?: 'Query', readonly ListReplyRequests?: { readonly __typename?: 'ListReplyRequestConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ListReplyRequestConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'ReplyRequest', readonly id: string, readonly reason?: string | null, readonly updatedAt?: string | null, readonly user?: { readonly __typename?: 'User', readonly id: string, readonly name?: string | null } | null, readonly article: { readonly __typename?: 'Article', readonly id: string, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly text?: string | null } } }> } | null };
 
 export type ReplyListStatInReplyTableQueryVariables = Exact<{
   createdAt?: InputMaybe<TimeRangeInput>;
@@ -1589,7 +1590,14 @@ export type ReplyListInReplyTableQueryVariables = Exact<{
 
 export type ReplyListInReplyTableQuery = { readonly __typename?: 'Query', readonly ListReplies?: { readonly __typename?: 'ReplyConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ReplyConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'Reply', readonly id: string, readonly text?: string | null, readonly createdAt?: string | null, readonly user?: { readonly __typename?: 'User', readonly id: string, readonly name?: string | null, readonly blockedReason?: string | null } | null, readonly articleReplies: ReadonlyArray<{ readonly __typename?: 'ArticleReply', readonly status: ArticleReplyStatusEnum }> } }> } | null };
 
-
+export const ArticleCellFieldsFragmentDoc = gql`
+    fragment ArticleCellFields on Article {
+  id
+  articleType
+  attachmentUrl
+  text
+}
+    `;
 export const LoadApiStatsDocument = gql`
     query LoadAPIStats($isRepliedOnly: Boolean!, $allArticleFilter: ListArticleFilter, $allRepliedArticlesFilter: ListArticleFilter!, $articlesHasUsefulRepliesFilter: ListArticleFilter!) {
   allArticles: ListArticles(filter: $allArticleFilter) @skip(if: $isRepliedOnly) {
@@ -1714,12 +1722,13 @@ export type LoadAnalyticsStatsLazyQueryHookResult = ReturnType<typeof useLoadAna
 export type LoadAnalyticsStatsQueryResult = Apollo.QueryResult<LoadAnalyticsStatsQuery, LoadAnalyticsStatsQueryVariables>;
 export const LoadAnalyticsDocument = gql`
     query LoadAnalytics($filter: ListArticleFilter, $dateRange: TimeRangeInput) {
-  ListArticles(filter: $filter, first: 25, orderBy: {createdAt: DESC}) {
+  ListArticles(filter: $filter, first: 50, orderBy: {createdAt: DESC}) {
     edges {
       cursor
       node {
         id
-        text
+        ...ArticleCellFields
+        createdAt
         stats(dateRange: $dateRange) {
           date
           lineUser
@@ -1736,7 +1745,7 @@ export const LoadAnalyticsDocument = gql`
     }
   }
 }
-    `;
+    ${ArticleCellFieldsFragmentDoc}`;
 
 /**
  * __useLoadAnalyticsQuery__
@@ -2055,16 +2064,13 @@ export const ReplyRequestListInReplyRequestTableDocument = gql`
           name
         }
         article {
-          id
-          text
-          articleType
-          attachmentUrl(variant: THUMBNAIL)
+          ...ArticleCellFields
         }
       }
     }
   }
 }
-    `;
+    ${ArticleCellFieldsFragmentDoc}`;
 
 /**
  * __useReplyRequestListInReplyRequestTableQuery__
