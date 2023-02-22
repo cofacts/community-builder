@@ -19,7 +19,7 @@ function Analytics() {
 
   return (
     <>
-      <TrendPlot articleEdges={articleEdges} style={{ height: 500 }} />
+      <TrendPlot articleEdges={articleEdges} style={{ height: 400 }} />
       <div style={{ height: 500 }}>
         <ArticlesTable articleEdges={articleEdges} />
       </div>

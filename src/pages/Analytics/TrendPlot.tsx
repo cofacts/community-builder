@@ -12,6 +12,8 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'short',
 });
 
+const numberFormatter = new Intl.NumberFormat();
+
 const ChartContainer = styled.div`
   position: relative;
   & > * {
@@ -36,6 +38,8 @@ type Point = { web: number; line: number; date: Date };
 type Props = {
   articleEdges: NonNullable<LoadAnalyticsQuery['ListArticles']>['edges'];
 } & React.ComponentPropsWithoutRef<'div'>;
+
+const MARGIN = 48;
 
 function TrendPlot({ articleEdges, ...containerProps }: Props) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -108,17 +112,17 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
   const sizeProps = useSize(chartContainerRef);
   const xScale = scaleTime()
     .domain(timeRange)
-    .range([0, sizeProps?.width ?? 0]);
+    .range([MARGIN, sizeProps ? sizeProps.width - MARGIN : 0]);
   const webScale = scaleLinear()
     .domain([0, maxWebVisit])
-    .range([sizeProps?.height ?? 0, 0]);
+    .range([sizeProps ? sizeProps.height - MARGIN : 0, MARGIN]);
   const webLineFn = line<Point>(
     (p) => xScale(p.date),
     (p) => webScale(p.web)
   ).curve(curveMonotoneX);
   const lineScale = scaleLinear()
     .domain([0, maxLineVisit])
-    .range([sizeProps?.height ?? 0, 0]);
+    .range([sizeProps ? sizeProps.height - MARGIN : 0, MARGIN]);
   const lineLineFn = line<Point>(
     (p) => xScale(p.date),
     (p) => lineScale(p.line)
@@ -130,22 +134,62 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
         <svg viewBox={`0 0 ${sizeProps.width} ${sizeProps.height}`}>
           <ChartLine d={webLineFn(points) ?? ''} stroke="blue" />
           <ChartLine d={lineLineFn(points) ?? ''} stroke="green" />
+          <line
+            x1={MARGIN}
+            x2={sizeProps ? sizeProps.width - MARGIN : 0}
+            y1={webScale(0)}
+            y2={webScale(0)}
+            stroke="#ccc"
+          />
         </svg>
       )}
-      <div>Y axis</div>
 
       {/* X-axis */}
-      <Axis style={{ width: '100%', bottom: 0 }}>
+      <Axis style={{ left: 0, right: 0, bottom: 0, height: MARGIN }}>
         {xScale.ticks().map((date, i) => (
           <span
             style={{
               left: xScale(date),
-              bottom: 0,
+              top: 0,
               transform: 'translateX(-50%)',
             }}
             key={i}
           >
             {dateFormatter.format(date)}
+          </span>
+        ))}
+      </Axis>
+
+      {/* Y-axis for web */}
+      <Axis style={{ top: 0, bottom: 0, left: 0, color: 'blue' }}>
+        {webScale.ticks().map((value, i) => (
+          <span
+            style={{
+              top: webScale(value),
+              width: MARGIN,
+              transform: 'translateY(-50%)',
+              textAlign: 'right',
+            }}
+            key={i}
+          >
+            {numberFormatter.format(value)}
+          </span>
+        ))}
+      </Axis>
+
+      {/* Y-axis for LINE */}
+      <Axis style={{ top: 0, bottom: 0, right: 0, color: 'green' }}>
+        {lineScale.ticks().map((value, i) => (
+          <span
+            style={{
+              top: lineScale(value),
+              width: MARGIN,
+              transform: 'translateY(-50%)',
+              right: 0,
+            }}
+            key={i}
+          >
+            {numberFormatter.format(value)}
           </span>
         ))}
       </Axis>

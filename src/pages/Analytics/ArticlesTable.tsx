@@ -27,7 +27,7 @@ const COLUMNS = [
   {
     field: 'text',
     headerName: 'Content',
-    width: 400,
+    width: 1000,
     renderCell(params) {
       const article: ArticleNode = params.row;
       return <ArticleCell article={article} />;
