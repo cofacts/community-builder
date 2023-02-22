@@ -52,6 +52,8 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
     maxWebVisit,
     /** max LINE visit */
     maxLineVisit,
+    totalWebVisit,
+    totalLineVisit,
   ] = useMemo(() => {
     const unixTsToDataMap = articleEdges.reduce<
       Map</* unix timestamp */ number, { web: number; line: number }>
@@ -101,11 +103,16 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
         : { date, web: 0, line: 0 };
     });
 
+    const webStats = entries.map(([, { web }]) => web);
+    const lineStats = entries.map(([, { line }]) => line);
+
     return [
       points,
       timeRange,
-      max(entries.map(([, { web }]) => web)) ?? 0,
-      max(entries.map(([, { line }]) => line)) ?? 0,
+      max(webStats) ?? 0,
+      max(lineStats) ?? 0,
+      webStats.reduce((sum, v) => sum + v, 0),
+      lineStats.reduce((sum, v) => sum + v, 0),
     ];
   }, [articleEdges]);
 
@@ -129,71 +136,83 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
   ).curve(curveMonotoneX);
 
   return (
-    <ChartContainer ref={chartContainerRef} {...containerProps}>
-      {sizeProps && (
-        <svg viewBox={`0 0 ${sizeProps.width} ${sizeProps.height}`}>
-          <ChartLine d={webLineFn(points) ?? ''} stroke="blue" />
-          <ChartLine d={lineLineFn(points) ?? ''} stroke="green" />
-          <line
-            x1={MARGIN}
-            x2={sizeProps ? sizeProps.width - MARGIN : 0}
-            y1={webScale(0)}
-            y2={webScale(0)}
-            stroke="#ccc"
-          />
-        </svg>
-      )}
+    <>
+      <div
+        style={{
+          display: 'flex',
+          padding: `8px ${MARGIN}px 0`,
+          justifyContent: 'space-between',
+        }}
+      >
+        <span style={{ color: 'blue' }}>Web visits: {totalWebVisit}</span>
+        <span style={{ color: 'green' }}>LINE visits: {totalLineVisit}</span>
+      </div>
+      <ChartContainer ref={chartContainerRef} {...containerProps}>
+        {sizeProps && (
+          <svg viewBox={`0 0 ${sizeProps.width} ${sizeProps.height}`}>
+            <ChartLine d={webLineFn(points) ?? ''} stroke="blue" />
+            <ChartLine d={lineLineFn(points) ?? ''} stroke="green" />
+            <line
+              x1={MARGIN}
+              x2={sizeProps ? sizeProps.width - MARGIN : 0}
+              y1={webScale(0)}
+              y2={webScale(0)}
+              stroke="#ccc"
+            />
+          </svg>
+        )}
 
-      {/* X-axis */}
-      <Axis style={{ left: 0, right: 0, bottom: 0, height: MARGIN }}>
-        {xScale.ticks().map((date, i) => (
-          <span
-            style={{
-              left: xScale(date),
-              top: 0,
-              transform: 'translateX(-50%)',
-            }}
-            key={i}
-          >
-            {dateFormatter.format(date)}
-          </span>
-        ))}
-      </Axis>
+        {/* X-axis */}
+        <Axis style={{ left: 0, right: 0, bottom: 0, height: MARGIN }}>
+          {xScale.ticks().map((date, i) => (
+            <span
+              style={{
+                left: xScale(date),
+                top: 0,
+                transform: 'translateX(-50%)',
+              }}
+              key={i}
+            >
+              {dateFormatter.format(date)}
+            </span>
+          ))}
+        </Axis>
 
-      {/* Y-axis for web */}
-      <Axis style={{ top: 0, bottom: 0, left: 0, color: 'blue' }}>
-        {webScale.ticks().map((value, i) => (
-          <span
-            style={{
-              top: webScale(value),
-              width: MARGIN,
-              transform: 'translateY(-50%)',
-              textAlign: 'right',
-            }}
-            key={i}
-          >
-            {numberFormatter.format(value)}
-          </span>
-        ))}
-      </Axis>
+        {/* Y-axis for web */}
+        <Axis style={{ top: 0, bottom: 0, left: 0, color: 'blue' }}>
+          {webScale.ticks().map((value, i) => (
+            <span
+              style={{
+                top: webScale(value),
+                width: MARGIN,
+                transform: 'translateY(-50%)',
+                textAlign: 'right',
+              }}
+              key={i}
+            >
+              {numberFormatter.format(value)}
+            </span>
+          ))}
+        </Axis>
 
-      {/* Y-axis for LINE */}
-      <Axis style={{ top: 0, bottom: 0, right: 0, color: 'green' }}>
-        {lineScale.ticks().map((value, i) => (
-          <span
-            style={{
-              top: lineScale(value),
-              width: MARGIN,
-              transform: 'translateY(-50%)',
-              right: 0,
-            }}
-            key={i}
-          >
-            {numberFormatter.format(value)}
-          </span>
-        ))}
-      </Axis>
-    </ChartContainer>
+        {/* Y-axis for LINE */}
+        <Axis style={{ top: 0, bottom: 0, right: 0, color: 'green' }}>
+          {lineScale.ticks().map((value, i) => (
+            <span
+              style={{
+                top: lineScale(value),
+                width: MARGIN,
+                transform: 'translateY(-50%)',
+                right: 0,
+              }}
+              key={i}
+            >
+              {numberFormatter.format(value)}
+            </span>
+          ))}
+        </Axis>
+      </ChartContainer>
+    </>
   );
 }
 
