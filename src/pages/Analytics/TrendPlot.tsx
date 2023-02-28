@@ -73,9 +73,8 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
 
         statOfTheDay.web += stat.webVisit ?? 0;
         statOfTheDay.line +=
-          stat.lineVisit ??
-          0 +
-            (stat.liff ?? []).reduce((sum, entry) => sum + entry.visit ?? 0, 0);
+          (stat.lineVisit ?? 0) +
+          (stat.liff ?? []).reduce((sum, entry) => sum + entry.visit, 0);
       }
       return agg;
     }, new Map());
