@@ -3,4 +3,7 @@ fragment ArticleCellFields on Article {
   articleType
   attachmentUrl
   text
+  hyperlinks {
+    title
+  }
 }

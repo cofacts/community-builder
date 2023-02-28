@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { ArticleCellFieldsFragment } from '../types';
+import { rejectsNull } from '../lib/util';
 
 export const TextCell = styled('div')({
   width: '100%',
@@ -60,6 +61,10 @@ export function ArticleCell({ article }: ArticleCellProps) {
                   title={article.text || ''}
                 >
                   {article.text || ''}
+                  {(article.hyperlinks || []).length > 0 &&
+                    (article.hyperlinks || [])
+                      .filter(rejectsNull)
+                      .map(({ title }) => title)}
                 </Typography>
               );
           }

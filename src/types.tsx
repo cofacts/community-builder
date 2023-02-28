@@ -1477,7 +1477,7 @@ export type YdocVersion = {
   /** Binary that stores as base64 encoded string */
   readonly snapshot?: Maybe<Scalars['String']>;
 };
-export type ArticleCellFieldsFragment = { readonly __typename?: 'Article', readonly id: string, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly text?: string | null };
+export type ArticleCellFieldsFragment = { readonly __typename?: 'Article', readonly id: string, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly text?: string | null, readonly hyperlinks?: ReadonlyArray<{ readonly __typename?: 'Hyperlink', readonly title?: string | null } | null> | null };
 
 export type LoadApiStatsQueryVariables = Exact<{
   isRepliedOnly: Scalars['Boolean'];
@@ -1507,7 +1507,7 @@ export type LoadAnalyticsQueryVariables = Exact<{
 }>;
 
 
-export type LoadAnalyticsQuery = { readonly __typename?: 'Query', readonly ListArticles?: { readonly __typename?: 'ArticleConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ArticleConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'Article', readonly id: string, readonly createdAt?: string | null, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly text?: string | null, readonly stats?: ReadonlyArray<{ readonly __typename?: 'Analytics', readonly date: string, readonly lineUser?: number | null, readonly lineVisit?: number | null, readonly webUser?: number | null, readonly webVisit?: number | null, readonly liff: ReadonlyArray<{ readonly __typename?: 'AnalyticsLiffEntry', readonly source: string, readonly user: number, readonly visit: number }> } | null> | null } }> } | null };
+export type LoadAnalyticsQuery = { readonly __typename?: 'Query', readonly ListArticles?: { readonly __typename?: 'ArticleConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ArticleConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'Article', readonly id: string, readonly createdAt?: string | null, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly text?: string | null, readonly stats?: ReadonlyArray<{ readonly __typename?: 'Analytics', readonly date: string, readonly lineUser?: number | null, readonly lineVisit?: number | null, readonly webUser?: number | null, readonly webVisit?: number | null, readonly liff: ReadonlyArray<{ readonly __typename?: 'AnalyticsLiffEntry', readonly source: string, readonly user: number, readonly visit: number }> } | null> | null, readonly hyperlinks?: ReadonlyArray<{ readonly __typename?: 'Hyperlink', readonly title?: string | null } | null> | null } }> } | null };
 
 export type BigNumOfRepliedQueryVariables = Exact<{
   startTime?: InputMaybe<Scalars['String']>;
@@ -1570,7 +1570,7 @@ export type ReplyRequestListInReplyRequestTableQueryVariables = Exact<{
 }>;
 
 
-export type ReplyRequestListInReplyRequestTableQuery = { readonly __typename?: 'Query', readonly ListReplyRequests?: { readonly __typename?: 'ListReplyRequestConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ListReplyRequestConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'ReplyRequest', readonly id: string, readonly reason?: string | null, readonly updatedAt?: string | null, readonly user?: { readonly __typename?: 'User', readonly id: string, readonly name?: string | null } | null, readonly article: { readonly __typename?: 'Article', readonly id: string, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly text?: string | null } } }> } | null };
+export type ReplyRequestListInReplyRequestTableQuery = { readonly __typename?: 'Query', readonly ListReplyRequests?: { readonly __typename?: 'ListReplyRequestConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ListReplyRequestConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'ReplyRequest', readonly id: string, readonly reason?: string | null, readonly updatedAt?: string | null, readonly user?: { readonly __typename?: 'User', readonly id: string, readonly name?: string | null } | null, readonly article: { readonly __typename?: 'Article', readonly id: string, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly text?: string | null, readonly hyperlinks?: ReadonlyArray<{ readonly __typename?: 'Hyperlink', readonly title?: string | null } | null> | null } } }> } | null };
 
 export type ReplyListStatInReplyTableQueryVariables = Exact<{
   createdAt?: InputMaybe<TimeRangeInput>;
@@ -1596,6 +1596,9 @@ export const ArticleCellFieldsFragmentDoc = gql`
   articleType
   attachmentUrl
   text
+  hyperlinks {
+    title
+  }
 }
     `;
 export const LoadApiStatsDocument = gql`
