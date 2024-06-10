@@ -30,6 +30,10 @@ const TextCell = styled('div')({
   '-webkit-line-clamp': 3,
 });
 
+const Blocked = styled('del')(({ theme }) => ({
+  color: theme.palette.grey[300],
+}));
+
 const COLUMNS: GridColDef[] = [
   {
     field: 'author',
@@ -40,6 +44,7 @@ const COLUMNS: GridColDef[] = [
       if (!user) return <div />;
       return (
         <RRLink
+          style={{ textDecoration: 'none' }}
           to={`?${getSearchString({
             workType: WorkType.REPLY,
             day: 7,
@@ -47,7 +52,11 @@ const COLUMNS: GridColDef[] = [
             showAll: true,
           })}`}
         >
-          {user.name}
+          {!user.blockedReason ? (
+            user.name
+          ) : (
+            <Blocked title={user.blockedReason}>{user.name}</Blocked>
+          )}
         </RRLink>
       );
     },
@@ -59,15 +68,21 @@ const COLUMNS: GridColDef[] = [
     renderCell(params) {
       const text = params.getValue(params.id, 'text');
       const replyId = params.getValue(params.id, 'id');
+      const { status } = params.getValue(params.id, 'articleReplies')[0] || {};
       if (!replyId || !text) return <div />;
       return (
         <TextCell>
           <Link
+            style={{ textDecoration: 'none' }}
             href={`${process.env.REACT_APP_SITE_URL}/reply/${replyId}`}
             color="textPrimary"
             variant="body2"
           >
-            {text}
+            {status === 'NORMAL' ? (
+              text
+            ) : (
+              <Blocked title={status}>{text}</Blocked>
+            )}
           </Link>
         </TextCell>
       );

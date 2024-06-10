@@ -17,6 +17,96 @@ export type Scalars = {
   Float: number;
 };
 
+/** A ChatGPT reply for an article with no human fact-checks yet */
+export type AiReply = AiResponse & Node & {
+  readonly __typename?: 'AIReply';
+  readonly createdAt: Scalars['String'];
+  /** The id for the document that this AI response is for. */
+  readonly docId?: Maybe<Scalars['ID']>;
+  readonly id: Scalars['ID'];
+  /** Processing status of AI */
+  readonly status: AiResponseStatusEnum;
+  /** AI response text. Populated after status becomes SUCCESS. */
+  readonly text?: Maybe<Scalars['String']>;
+  /** AI response type */
+  readonly type: AiResponseTypeEnum;
+  readonly updatedAt?: Maybe<Scalars['String']>;
+  /** The usage returned from OpenAI. Populated after status becomes SUCCESS. */
+  readonly usage?: Maybe<OpenAiCompletionUsage>;
+  /** The user triggered this AI response */
+  readonly user?: Maybe<User>;
+};
+
+/** Denotes an AI processed response and its processing status. */
+export type AiResponse = {
+  readonly createdAt: Scalars['String'];
+  /** The id for the document that this AI response is for. */
+  readonly docId?: Maybe<Scalars['ID']>;
+  readonly id: Scalars['ID'];
+  /** Processing status of AI */
+  readonly status: AiResponseStatusEnum;
+  /** AI response text. Populated after status becomes SUCCESS. */
+  readonly text?: Maybe<Scalars['String']>;
+  /** AI response type */
+  readonly type: AiResponseTypeEnum;
+  readonly updatedAt?: Maybe<Scalars['String']>;
+  /** The user triggered this AI response */
+  readonly user?: Maybe<User>;
+};
+
+export type AiResponseConnection = Connection & {
+  readonly __typename?: 'AIResponseConnection';
+  readonly edges: ReadonlyArray<AiResponseConnectionEdge>;
+  readonly pageInfo: AiResponseConnectionPageInfo;
+  /** The total count of the entire collection, regardless of "before", "after". */
+  readonly totalCount: Scalars['Int'];
+};
+
+export type AiResponseConnectionEdge = Edge & {
+  readonly __typename?: 'AIResponseConnectionEdge';
+  readonly cursor: Scalars['String'];
+  readonly highlight?: Maybe<Highlights>;
+  readonly node: AiResponse;
+  readonly score?: Maybe<Scalars['Float']>;
+};
+
+export type AiResponseConnectionPageInfo = PageInfo & {
+  readonly __typename?: 'AIResponseConnectionPageInfo';
+  readonly firstCursor?: Maybe<Scalars['String']>;
+  readonly lastCursor?: Maybe<Scalars['String']>;
+};
+
+export enum AiResponseStatusEnum {
+  Error = 'ERROR',
+  Loading = 'LOADING',
+  Success = 'SUCCESS'
+}
+
+export enum AiResponseTypeEnum {
+  /** The AI Response is an automated analysis / reply of an article. */
+  AiReply = 'AI_REPLY',
+  /** AI transcribed text of the specified article. */
+  Transcript = 'TRANSCRIPT'
+}
+
+/** Transcript from OCR or speech-to-text AI models for the specified MediaEntry ID as docId. */
+export type AiTranscript = AiResponse & Node & {
+  readonly __typename?: 'AITranscript';
+  readonly createdAt: Scalars['String'];
+  /** The id for the document that this AI response is for. */
+  readonly docId?: Maybe<Scalars['ID']>;
+  readonly id: Scalars['ID'];
+  /** Processing status of AI */
+  readonly status: AiResponseStatusEnum;
+  /** AI response text. Populated after status becomes SUCCESS. */
+  readonly text?: Maybe<Scalars['String']>;
+  /** AI response type */
+  readonly type: AiResponseTypeEnum;
+  readonly updatedAt?: Maybe<Scalars['String']>;
+  /** The user triggered this AI response */
+  readonly user?: Maybe<User>;
+};
+
 export type Analytics = Node & {
   readonly __typename?: 'Analytics';
   /** The day this analytic datapoint is represented, in YYYY-MM-DD format */
@@ -78,9 +168,13 @@ export type AnalyticsLiffEntry = {
 
 export type Article = Node & {
   readonly __typename?: 'Article';
-  readonly articleCategories?: Maybe<ReadonlyArray<Maybe<ArticleCategory>>>;
+  /** Automated reply from AI before human fact checkers compose an fact check */
+  readonly aiReplies: ReadonlyArray<AiReply>;
+  /** Automated transcript */
+  readonly aiTranscripts: ReadonlyArray<AiTranscript>;
+  readonly articleCategories: ReadonlyArray<ArticleCategory>;
   /** Connections between this article and replies. Sorted by the logic described in https://github.com/cofacts/rumors-line-bot/issues/78. */
-  readonly articleReplies?: Maybe<ReadonlyArray<Maybe<ArticleReply>>>;
+  readonly articleReplies: ReadonlyArray<ArticleReply>;
   /** Message event type */
   readonly articleType: ArticleTypeEnum;
   /** Attachment hash to search or identify files */
@@ -88,16 +182,20 @@ export type Article = Node & {
   /** Attachment URL for this article. */
   readonly attachmentUrl?: Maybe<Scalars['String']>;
   /** Number of normal article categories */
-  readonly categoryCount?: Maybe<Scalars['Int']>;
+  readonly categoryCount: Scalars['Int'];
+  /** Transcript contributors of the article */
+  readonly contributors: ReadonlyArray<Contributor>;
+  readonly cooccurrences?: Maybe<ReadonlyArray<Cooccurrence>>;
+  /** May be null for legacy articles */
   readonly createdAt?: Maybe<Scalars['String']>;
   /** Hyperlinks in article text */
   readonly hyperlinks?: Maybe<ReadonlyArray<Maybe<Hyperlink>>>;
   readonly id: Scalars['ID'];
   readonly lastRequestedAt?: Maybe<Scalars['String']>;
   readonly references?: Maybe<ReadonlyArray<Maybe<ArticleReference>>>;
-  readonly relatedArticles?: Maybe<ArticleConnection>;
+  readonly relatedArticles: ArticleConnection;
   /** Number of normal article replies */
-  readonly replyCount?: Maybe<Scalars['Int']>;
+  readonly replyCount: Scalars['Int'];
   readonly replyRequestCount?: Maybe<Scalars['Int']>;
   readonly replyRequests?: Maybe<ReadonlyArray<Maybe<ReplyRequest>>>;
   /** If the current user has requested for reply for this article. Null if not logged in. */
@@ -106,6 +204,8 @@ export type Article = Node & {
   readonly stats?: Maybe<ReadonlyArray<Maybe<Analytics>>>;
   readonly status: ReplyRequestStatusEnum;
   readonly text?: Maybe<Scalars['String']>;
+  /** Time when the article was last transcribed */
+  readonly transcribedAt?: Maybe<Scalars['String']>;
   readonly updatedAt?: Maybe<Scalars['String']>;
   /** The user submitted this article */
   readonly user?: Maybe<User>;
@@ -124,6 +224,7 @@ export type ArticleArticleRepliesArgs = {
   status?: InputMaybe<ArticleReplyStatusEnum>;
   statuses?: InputMaybe<ReadonlyArray<ArticleReplyStatusEnum>>;
   userId?: InputMaybe<Scalars['String']>;
+  userIds?: InputMaybe<ReadonlyArray<Scalars['String']>>;
 };
 
 
@@ -229,6 +330,11 @@ export type ArticleConnectionEdge = Edge & {
   readonly __typename?: 'ArticleConnectionEdge';
   readonly cursor: Scalars['String'];
   readonly highlight?: Maybe<Highlights>;
+  /**
+   * The search hit's similarity with provided mediaUrl.
+   *           Ranges from 0 to 1. 0 if mediaUrl is not provided, or the hit is not matched by mediaUrl.
+   */
+  readonly mediaSimilarity: Scalars['Float'];
   readonly node: Article;
   readonly score?: Maybe<Scalars['Float']>;
 };
@@ -241,9 +347,9 @@ export type ArticleConnectionPageInfo = PageInfo & {
 
 export type ArticleReference = {
   readonly __typename?: 'ArticleReference';
-  readonly createdAt?: Maybe<Scalars['String']>;
+  readonly createdAt: Scalars['String'];
   readonly permalink?: Maybe<Scalars['String']>;
-  readonly type?: Maybe<ArticleReferenceTypeEnum>;
+  readonly type: ArticleReferenceTypeEnum;
 };
 
 export type ArticleReferenceInput = {
@@ -264,20 +370,21 @@ export type ArticleReply = {
   readonly __typename?: 'ArticleReply';
   readonly appId: Scalars['String'];
   readonly article?: Maybe<Article>;
-  readonly articleId?: Maybe<Scalars['String']>;
-  readonly canUpdateStatus?: Maybe<Scalars['Boolean']>;
+  readonly articleId: Scalars['String'];
+  readonly canUpdateStatus: Scalars['Boolean'];
+  /** May be null for legacy article-replies */
   readonly createdAt?: Maybe<Scalars['String']>;
-  readonly feedbackCount?: Maybe<Scalars['Int']>;
-  readonly feedbacks?: Maybe<ReadonlyArray<Maybe<ArticleReplyFeedback>>>;
-  readonly negativeFeedbackCount?: Maybe<Scalars['Int']>;
+  readonly feedbackCount: Scalars['Int'];
+  readonly feedbacks: ReadonlyArray<ArticleReplyFeedback>;
+  readonly negativeFeedbackCount: Scalars['Int'];
   /** The feedback of current user. null when not logged in or not voted yet. */
   readonly ownVote?: Maybe<FeedbackVote>;
-  readonly positiveFeedbackCount?: Maybe<Scalars['Int']>;
+  readonly positiveFeedbackCount: Scalars['Int'];
   readonly reply?: Maybe<Reply>;
-  readonly replyId?: Maybe<Scalars['String']>;
+  readonly replyId: Scalars['String'];
   /** Cached reply type value stored in ArticleReply */
   readonly replyType?: Maybe<ReplyTypeEnum>;
-  readonly status?: Maybe<ArticleReplyStatusEnum>;
+  readonly status: ArticleReplyStatusEnum;
   readonly updatedAt?: Maybe<Scalars['String']>;
   /** The user who conencted this reply and this article. */
   readonly user?: Maybe<User>;
@@ -337,6 +444,8 @@ export type ArticleReplyFilterInput = {
   readonly statuses?: InputMaybe<ReadonlyArray<ArticleReplyStatusEnum>>;
   /** Show only articleReplies created by the specific user. */
   readonly userId?: InputMaybe<Scalars['String']>;
+  /** Show only articleReplies created by the specified users. */
+  readonly userIds?: InputMaybe<ReadonlyArray<Scalars['String']>>;
 };
 
 export enum ArticleReplyStatusEnum {
@@ -414,6 +523,26 @@ export type Contribution = {
   readonly date?: Maybe<Scalars['String']>;
 };
 
+export type Contributor = {
+  readonly __typename?: 'Contributor';
+  readonly appId: Scalars['String'];
+  readonly updatedAt?: Maybe<Scalars['String']>;
+  /** The user who contributed to this article. */
+  readonly user?: Maybe<User>;
+  readonly userId: Scalars['String'];
+};
+
+export type Cooccurrence = Node & {
+  readonly __typename?: 'Cooccurrence';
+  readonly appId: Scalars['String'];
+  readonly articleIds: ReadonlyArray<Scalars['String']>;
+  readonly articles: ReadonlyArray<Article>;
+  readonly createdAt: Scalars['String'];
+  readonly id: Scalars['ID'];
+  readonly updatedAt: Scalars['String'];
+  readonly userId: Scalars['String'];
+};
+
 /** Edge in Connection. Modeled after GraphQL connection model. */
 export type Edge = {
   readonly cursor: Scalars['String'];
@@ -449,6 +578,35 @@ export type Hyperlink = {
   readonly topImageUrl?: Maybe<Scalars['String']>;
   /** URL in text */
   readonly url?: Maybe<Scalars['String']>;
+};
+
+export type ListAiResponsesFilter = {
+  /** Show only AI responses created by a specific app. */
+  readonly appId?: InputMaybe<Scalars['String']>;
+  /** List only the AI responses that were created between the specific time range. */
+  readonly createdAt?: InputMaybe<TimeRangeInput>;
+  /** If specified, only return AI repsonses under the specified doc IDs. */
+  readonly docIds?: InputMaybe<ReadonlyArray<Scalars['ID']>>;
+  /** If given, only list out AI responses with specific IDs */
+  readonly ids?: InputMaybe<ReadonlyArray<Scalars['ID']>>;
+  /** Only list the AI responses created by the currently logged in user */
+  readonly selfOnly?: InputMaybe<Scalars['Boolean']>;
+  /** If specified, only return AI repsonses under the specified statuses. */
+  readonly statuses?: InputMaybe<ReadonlyArray<AiResponseStatusEnum>>;
+  /** If specified, only return AI repsonses with the specified types. */
+  readonly types?: InputMaybe<ReadonlyArray<AiResponseTypeEnum>>;
+  /** List only the AI responses updated within the specific time range. */
+  readonly updatedAt?: InputMaybe<TimeRangeInput>;
+  /** Show only AI responses created by the specific user. */
+  readonly userId?: InputMaybe<Scalars['String']>;
+  /** Show only AI responses created by the specified users. */
+  readonly userIds?: InputMaybe<ReadonlyArray<Scalars['String']>>;
+};
+
+/** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
+export type ListAiResponsesOrderBy = {
+  readonly createdAt?: InputMaybe<SortOrderEnum>;
+  readonly updatedAt?: InputMaybe<SortOrderEnum>;
 };
 
 export type ListAnalyticsFilter = {
@@ -508,8 +666,14 @@ export type ListArticleFilter = {
   readonly selfOnly?: InputMaybe<Scalars['Boolean']>;
   /** Returns only articles with the specified statuses */
   readonly statuses?: InputMaybe<ReadonlyArray<ArticleStatusEnum>>;
+  /** Show only articles with(out) article transcript contributed by specified user */
+  readonly transcribedBy?: InputMaybe<UserAndExistInput>;
+  /** Specifies how the transcript of `mediaUrl` can be used to search. Can only specify `transcript` when `mediaUrl` is specified. */
+  readonly transcript?: InputMaybe<TranscriptFilter>;
   /** Show only articles created by the specific user. */
   readonly userId?: InputMaybe<Scalars['String']>;
+  /** Show only articles created by the specified users. */
+  readonly userIds?: InputMaybe<ReadonlyArray<Scalars['String']>>;
 };
 
 /** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
@@ -571,6 +735,8 @@ export type ListArticleReplyFeedbackFilter = {
   readonly updatedAt?: InputMaybe<TimeRangeInput>;
   /** Show only article reply feedbacks created by the specific user. */
   readonly userId?: InputMaybe<Scalars['String']>;
+  /** Show only article reply feedbacks created by the specified users. */
+  readonly userIds?: InputMaybe<ReadonlyArray<Scalars['String']>>;
   /** When specified, list only article reply feedbacks with specified vote */
   readonly vote?: InputMaybe<ReadonlyArray<InputMaybe<FeedbackVote>>>;
 };
@@ -621,6 +787,39 @@ export type ListCategoryOrderBy = {
   readonly createdAt?: InputMaybe<SortOrderEnum>;
 };
 
+export type ListCooccurrenceConnection = Connection & {
+  readonly __typename?: 'ListCooccurrenceConnection';
+  readonly edges: ReadonlyArray<ListCooccurrenceConnectionEdge>;
+  readonly pageInfo: ListCooccurrenceConnectionPageInfo;
+  /** The total count of the entire collection, regardless of "before", "after". */
+  readonly totalCount: Scalars['Int'];
+};
+
+export type ListCooccurrenceConnectionEdge = Edge & {
+  readonly __typename?: 'ListCooccurrenceConnectionEdge';
+  readonly cursor: Scalars['String'];
+  readonly highlight?: Maybe<Highlights>;
+  readonly node: Cooccurrence;
+  readonly score?: Maybe<Scalars['Float']>;
+};
+
+export type ListCooccurrenceConnectionPageInfo = PageInfo & {
+  readonly __typename?: 'ListCooccurrenceConnectionPageInfo';
+  readonly firstCursor?: Maybe<Scalars['String']>;
+  readonly lastCursor?: Maybe<Scalars['String']>;
+};
+
+export type ListCooccurrenceFilter = {
+  /** List only the cooccurrence that were last updated within the specific time range. */
+  readonly updatedAt?: InputMaybe<TimeRangeInput>;
+};
+
+/** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
+export type ListCooccurrenceOrderBy = {
+  readonly createdAt?: InputMaybe<SortOrderEnum>;
+  readonly updatedAt?: InputMaybe<SortOrderEnum>;
+};
+
 export type ListReplyFilter = {
   /** Show only replies created by a specific app. */
   readonly appId?: InputMaybe<Scalars['String']>;
@@ -637,6 +836,8 @@ export type ListReplyFilter = {
   readonly types?: InputMaybe<ReadonlyArray<InputMaybe<ReplyTypeEnum>>>;
   /** Show only replies created by the specific user. */
   readonly userId?: InputMaybe<Scalars['String']>;
+  /** Show only replies created by the specified users. */
+  readonly userIds?: InputMaybe<ReadonlyArray<Scalars['String']>>;
 };
 
 /** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
@@ -681,6 +882,8 @@ export type ListReplyRequestFilter = {
   readonly statuses?: InputMaybe<ReadonlyArray<ReplyRequestStatusEnum>>;
   /** Show only reply requests created by the specific user. */
   readonly userId?: InputMaybe<Scalars['String']>;
+  /** Show only reply requests created by the specified users. */
+  readonly userIds?: InputMaybe<ReadonlyArray<Scalars['String']>>;
 };
 
 /** An entry of orderBy argument. Specifies field name and the sort order. Only one field name is allowd per entry. */
@@ -705,6 +908,8 @@ export type MoreLikeThisInput = {
 
 export type Mutation = {
   readonly __typename?: 'Mutation';
+  /** Create an AI reply for a specific article. If existed, returns an existing one. If information in the article is not sufficient for AI, return null. */
+  readonly CreateAIReply?: Maybe<AiReply>;
   /** Create an article and/or a replyRequest */
   readonly CreateArticle?: Maybe<MutationResult>;
   /** Adds specified category to specified article. */
@@ -719,6 +924,8 @@ export type Mutation = {
   readonly CreateOrUpdateArticleCategoryFeedback?: Maybe<ArticleCategory>;
   /** Create or update a feedback on an article-reply connection */
   readonly CreateOrUpdateArticleReplyFeedback?: Maybe<ArticleReply>;
+  /** Create or update a cooccurrence for the given articles */
+  readonly CreateOrUpdateCooccurrence?: Maybe<Cooccurrence>;
   /** Create or update a reply request for the given article */
   readonly CreateOrUpdateReplyRequest?: Maybe<Article>;
   /** Create or update a feedback on a reply request reason */
@@ -736,6 +943,11 @@ export type Mutation = {
   readonly UpdateArticleReplyStatus?: Maybe<ReadonlyArray<Maybe<ArticleReply>>>;
   /** Change attribute of a user */
   readonly UpdateUser?: Maybe<User>;
+};
+
+
+export type MutationCreateAiReplyArgs = {
+  articleId: Scalars['String'];
 };
 
 
@@ -787,6 +999,11 @@ export type MutationCreateOrUpdateArticleReplyFeedbackArgs = {
   comment?: InputMaybe<Scalars['String']>;
   replyId: Scalars['String'];
   vote: FeedbackVote;
+};
+
+
+export type MutationCreateOrUpdateCooccurrenceArgs = {
+  articleIds?: InputMaybe<ReadonlyArray<Scalars['String']>>;
 };
 
 
@@ -849,6 +1066,13 @@ export type Node = {
   readonly id: Scalars['ID'];
 };
 
+export type OpenAiCompletionUsage = {
+  readonly __typename?: 'OpenAICompletionUsage';
+  readonly completionTokens: Scalars['Int'];
+  readonly promptTokens: Scalars['Int'];
+  readonly totalTokens: Scalars['Int'];
+};
+
 /** PageInfo in Connection. Modeled after GraphQL connection model. */
 export type PageInfo = {
   /** The cursor pointing to the first node of the entire collection, regardless of "before" and "after". Can be used to determine if is in the last page. Null when the collection is empty. */
@@ -880,11 +1104,14 @@ export type Query = {
    *
    */
   readonly GetUser?: Maybe<User>;
+  readonly GetYdoc?: Maybe<Ydoc>;
+  readonly ListAIResponses: AiResponseConnection;
   readonly ListAnalytics: AnalyticsConnection;
   readonly ListArticleReplyFeedbacks?: Maybe<ListArticleReplyFeedbackConnection>;
   readonly ListArticles?: Maybe<ArticleConnection>;
   readonly ListBlockedUsers: UserConnection;
   readonly ListCategories?: Maybe<ListCategoryConnection>;
+  readonly ListCooccurrences?: Maybe<ListCooccurrenceConnection>;
   readonly ListReplies?: Maybe<ReplyConnection>;
   readonly ListReplyRequests?: Maybe<ListReplyRequestConnection>;
   readonly ValidateSlug?: Maybe<ValidationResult>;
@@ -909,6 +1136,20 @@ export type QueryGetReplyArgs = {
 export type QueryGetUserArgs = {
   id?: InputMaybe<Scalars['String']>;
   slug?: InputMaybe<Scalars['String']>;
+};
+
+
+export type QueryGetYdocArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryListAiResponsesArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  filter?: InputMaybe<ListAiResponsesFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ListAiResponsesOrderBy>>>;
 };
 
 
@@ -956,6 +1197,15 @@ export type QueryListCategoriesArgs = {
 };
 
 
+export type QueryListCooccurrencesArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  filter?: InputMaybe<ListCooccurrenceFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ListCooccurrenceOrderBy>>>;
+};
+
+
 export type QueryListRepliesArgs = {
   after?: InputMaybe<Scalars['String']>;
   before?: InputMaybe<Scalars['String']>;
@@ -999,16 +1249,17 @@ export type RelatedArticleOrderBy = {
 
 export type Reply = Node & {
   readonly __typename?: 'Reply';
-  readonly articleReplies?: Maybe<ReadonlyArray<Maybe<ArticleReply>>>;
+  readonly articleReplies: ReadonlyArray<ArticleReply>;
+  /** May be null for legacy replies */
   readonly createdAt?: Maybe<Scalars['String']>;
   /** Hyperlinks in reply text or reference. May be empty array if no URLs are included. `null` when hyperlinks are still fetching. */
   readonly hyperlinks?: Maybe<ReadonlyArray<Maybe<Hyperlink>>>;
   readonly id: Scalars['ID'];
   readonly reference?: Maybe<Scalars['String']>;
   /** Replies that has similar text or references of this current reply */
-  readonly similarReplies?: Maybe<ReplyConnection>;
+  readonly similarReplies: ReplyConnection;
   readonly text?: Maybe<Scalars['String']>;
-  readonly type?: Maybe<ReplyTypeEnum>;
+  readonly type: ReplyTypeEnum;
   /** The user submitted this reply version */
   readonly user?: Maybe<User>;
 };
@@ -1119,6 +1370,16 @@ export type TimeRangeInput = {
   readonly LTE?: InputMaybe<Scalars['String']>;
 };
 
+export type TranscriptFilter = {
+  /**
+   * more_like_this query's "minimum_should_match" query param for the transcript of `mediaUrl`
+   * See https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html for possible values.
+   */
+  readonly minimumShouldMatch?: InputMaybe<Scalars['String']>;
+  /** Only used when `filter.mediaUrl` is provided. Generates transcript if provided `filter.mediaUrl` is not transcribed previously. */
+  readonly shouldCreate?: InputMaybe<Scalars['Boolean']>;
+};
+
 export type User = Node & {
   readonly __typename?: 'User';
   readonly appId?: Maybe<Scalars['String']>;
@@ -1166,8 +1427,8 @@ export type UserContributionsArgs = {
 export type UserAndExistInput = {
   /**
    *
-   *                   When true (or not specified), return only entries with the specified user's involvement.
-   *                   When false, return only entries that the specified user did not involve.
+   *         When true (or not specified), return only entries with the specified user's involvement.
+   *         When false, return only entries that the specified user did not involve.
    *
    */
   readonly exists?: InputMaybe<Scalars['Boolean']>;
@@ -1200,6 +1461,21 @@ export type ValidationResult = {
   readonly __typename?: 'ValidationResult';
   readonly error?: Maybe<SlugErrorEnum>;
   readonly success: Scalars['Boolean'];
+};
+
+export type Ydoc = {
+  readonly __typename?: 'Ydoc';
+  /** Binary that stores as base64 encoded string */
+  readonly data?: Maybe<Scalars['String']>;
+  /** Ydoc snapshots which are used to restore to specific version */
+  readonly versions?: Maybe<ReadonlyArray<Maybe<YdocVersion>>>;
+};
+
+export type YdocVersion = {
+  readonly __typename?: 'YdocVersion';
+  readonly createdAt?: Maybe<Scalars['String']>;
+  /** Binary that stores as base64 encoded string */
+  readonly snapshot?: Maybe<Scalars['String']>;
 };
 
 export type LoadApiStatsQueryVariables = Exact<{
@@ -1258,7 +1534,7 @@ export type FeedbackListInFeedbackTableQueryVariables = Exact<{
 }>;
 
 
-export type FeedbackListInFeedbackTableQuery = { readonly __typename?: 'Query', readonly ListArticleReplyFeedbacks?: { readonly __typename?: 'ListArticleReplyFeedbackConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ListArticleReplyFeedbackConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'ArticleReplyFeedback', readonly id: string, readonly comment?: string | null, readonly vote?: FeedbackVote | null, readonly createdAt?: string | null, readonly article?: { readonly __typename?: 'Article', readonly id: string, readonly text?: string | null, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly articleCategories?: ReadonlyArray<{ readonly __typename?: 'ArticleCategory', readonly positiveFeedbackCount?: number | null, readonly negativeFeedbackCount?: number | null, readonly category?: { readonly __typename?: 'Category', readonly title?: string | null } | null } | null> | null } | null, readonly reply?: { readonly __typename?: 'Reply', readonly id: string, readonly text?: string | null } | null, readonly user?: { readonly __typename?: 'User', readonly id: string, readonly name?: string | null } | null } }> } | null };
+export type FeedbackListInFeedbackTableQuery = { readonly __typename?: 'Query', readonly ListArticleReplyFeedbacks?: { readonly __typename?: 'ListArticleReplyFeedbackConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ListArticleReplyFeedbackConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'ArticleReplyFeedback', readonly id: string, readonly comment?: string | null, readonly vote?: FeedbackVote | null, readonly createdAt?: string | null, readonly article?: { readonly __typename?: 'Article', readonly id: string, readonly text?: string | null, readonly articleType: ArticleTypeEnum, readonly attachmentUrl?: string | null, readonly articleCategories: ReadonlyArray<{ readonly __typename?: 'ArticleCategory', readonly positiveFeedbackCount?: number | null, readonly negativeFeedbackCount?: number | null, readonly category?: { readonly __typename?: 'Category', readonly title?: string | null } | null }> } | null, readonly reply?: { readonly __typename?: 'Reply', readonly id: string, readonly text?: string | null } | null, readonly user?: { readonly __typename?: 'User', readonly id: string, readonly name?: string | null } | null } }> } | null };
 
 export type ReplyRequestListStatInReplyRequestTableQueryVariables = Exact<{
   createdAt?: InputMaybe<TimeRangeInput>;
@@ -1296,7 +1572,7 @@ export type ReplyListInReplyTableQueryVariables = Exact<{
 }>;
 
 
-export type ReplyListInReplyTableQuery = { readonly __typename?: 'Query', readonly ListReplies?: { readonly __typename?: 'ReplyConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ReplyConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'Reply', readonly id: string, readonly text?: string | null, readonly createdAt?: string | null, readonly user?: { readonly __typename?: 'User', readonly id: string, readonly name?: string | null } | null } }> } | null };
+export type ReplyListInReplyTableQuery = { readonly __typename?: 'Query', readonly ListReplies?: { readonly __typename?: 'ReplyConnection', readonly edges: ReadonlyArray<{ readonly __typename?: 'ReplyConnectionEdge', readonly cursor: string, readonly node: { readonly __typename?: 'Reply', readonly id: string, readonly text?: string | null, readonly createdAt?: string | null, readonly user?: { readonly __typename?: 'User', readonly id: string, readonly name?: string | null, readonly blockedReason?: string | null } | null, readonly articleReplies: ReadonlyArray<{ readonly __typename?: 'ArticleReply', readonly status: ArticleReplyStatusEnum }> } }> } | null };
 
 
 export const LoadApiStatsDocument = gql`
@@ -1769,8 +2045,12 @@ export const ReplyListInReplyTableDocument = gql`
         user {
           id
           name
+          blockedReason
         }
         createdAt
+        articleReplies {
+          status
+        }
       }
     }
   }
