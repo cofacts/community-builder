@@ -1,9 +1,7 @@
 import React from 'react';
-import { styled } from '@mui/material/styles';
-import Link from '@mui/material/Link';
 import { Link as RRLink } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
+import { ArticleCell, TextCell } from '../../components/cells';
 import { GridColDef } from '@mui/x-data-grid';
 import { getSearchString, WorkType } from './util';
 
@@ -25,16 +23,6 @@ type UpdatedAt = NonNullable<
 type Article = NonNullable<
   ReplyRequestListInReplyRequestTableQuery['ListReplyRequests']
 >['edges'][number]['node']['article'];
-
-const TextCell = styled('div')({
-  width: '100%',
-  overflow: 'hidden',
-  display: '-webkit-box',
-  whiteSpace: 'normal',
-  lineHeight: 1.2,
-  '-webkit-box-orient': 'vertical',
-  '-webkit-line-clamp': 3,
-});
 
 const COLUMNS: GridColDef[] = [
   {
@@ -73,48 +61,7 @@ const COLUMNS: GridColDef[] = [
     width: 300,
     renderCell(params) {
       const article = params.value as Article;
-      return (
-        <TextCell>
-          <Link
-            href={`${process.env.REACT_APP_SITE_URL}/article/${article.id}`}
-            color="textPrimary"
-            variant="body2"
-          >
-            {(() => {
-              switch (article.articleType) {
-                case 'IMAGE':
-                  return article.attachmentUrl ? (
-                    <img
-                      style={{ height: 64, verticalAlign: 'bottom' }}
-                      src={article.attachmentUrl}
-                      alt={article.id}
-                    />
-                  ) : (
-                    'Image'
-                  );
-                case 'AUDIO':
-                  return (
-                    <Typography variant="body2" title={article.text || ''}>
-                      Audio
-                    </Typography>
-                  );
-                case 'VIDEO':
-                  return (
-                    <Typography variant="body2" title={article.text || ''}>
-                      Video
-                    </Typography>
-                  );
-                default:
-                  return (
-                    <Typography variant="body2" title={article.text || ''}>
-                      {article.text || ''}
-                    </Typography>
-                  );
-              }
-            })()}
-          </Link>
-        </TextCell>
-      );
+      return <ArticleCell article={article} />;
     },
   },
   {
