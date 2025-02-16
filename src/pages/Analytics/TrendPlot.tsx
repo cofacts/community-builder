@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { line, curveMonotoneX } from 'd3-shape';
 import { extent, max } from 'd3-array';
+import { Card, CardContent } from '@mui/material';
 
 import { useSize } from '../../lib/util';
 
@@ -31,6 +32,46 @@ const Axis = styled.div`
 const ChartLine = styled.path`
   stroke-width: 2px;
   fill: none;
+`;
+
+const HitboxDiv = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  cursor: crosshair;
+
+  > * {
+    display: none;
+  }
+
+  &:hover > * {
+    display: block;
+  }
+`;
+
+const Dot = styled.div`
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
+const DotStat = styled.dl`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px;
+  margin: 8px 0 0;
+
+  dt {
+    color: #666;
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+  }
 `;
 
 type Point = {
@@ -191,6 +232,82 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
           </svg>
         )}
 
+        {/* Point hitboxes */}
+        {points.map((point, idx) => {
+          if (!sizeProps) return null;
+
+          // Calculate hitbox width - use half the distance to adjacent points
+          const prevX = idx > 0 ? xScale(points[idx - 1].date) : MARGIN;
+          const nextX =
+            idx < points.length - 1
+              ? xScale(points[idx + 1].date)
+              : sizeProps.width - MARGIN;
+          const x = xScale(point.date);
+
+          const hitboxLeft = (prevX + x) / 2;
+          const hitboxRight = (nextX + x) / 2;
+          const width = hitboxRight - hitboxLeft;
+
+          const avgY = (webScale(point.web) + lineScale(point.line)) / 2;
+
+          return (
+            <HitboxDiv
+              key={point.date.getTime()}
+              style={{
+                left: hitboxLeft,
+                width,
+              }}
+            >
+              <Dot
+                style={{
+                  backgroundColor: 'blue',
+                  top: webScale(point.web),
+                }}
+              />
+              <Dot
+                style={{
+                  backgroundColor: 'green',
+                  top: lineScale(point.line),
+                }}
+              />
+
+              {/* A card that shows the details of the point */}
+              <Card
+                sx={{
+                  position: 'absolute',
+                  backgroundColor: 'white',
+                  zIndex: 1,
+                  minWidth: 'max-content',
+                  pointerEvents: 'none', // Don't interfere with the hitbox
+                  /* Position the card so that it does not cover the hitbox */
+                  ...(idx > points.length / 2
+                    ? { right: '100%' }
+                    : { left: '100%' }),
+                  top: avgY,
+                  transform: 'translateY(-50%)',
+                }}
+              >
+                <CardContent>
+                  {dateFormatter.format(point.date)}
+                  <DotStat>
+                    <dt>Web</dt>
+                    <dd>{numberFormatter.format(point.web)}</dd>
+                    <dt>LINE bot</dt>
+                    <dd>{numberFormatter.format(point.lineDetail.cofacts)}</dd>
+                    {Object.entries(point.lineDetail.liff).map(
+                      ([source, visits]) => (
+                        <React.Fragment key={source}>
+                          <dt>LIFF ({source || 'other'})</dt>
+                          <dd>{numberFormatter.format(visits)}</dd>
+                        </React.Fragment>
+                      )
+                    )}
+                  </DotStat>
+                </CardContent>
+              </Card>
+            </HitboxDiv>
+          );
+        })}
         {/* X-axis */}
         <Axis style={{ left: 0, right: 0, bottom: 0, height: MARGIN }}>
           {xScale.ticks().map((date, i) => (
