@@ -1,10 +1,11 @@
 import React from 'react';
-import { styled } from '@mui/material/styles';
+
 import Chip from '@mui/material/Chip';
 import Link from '@mui/material/Link';
 import { Link as RRLink } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import DataTable, { PAGE_SIZE } from '../../components/DataTable';
+import { TextCell } from '../../components/cells';
 import { GridColDef } from '@mui/x-data-grid';
 import { getSearchString, WorkType } from './util';
 
@@ -50,16 +51,6 @@ function isValidArticleCategory(
     ar.positiveFeedbackCount >= ar.negativeFeedbackCount
   );
 }
-
-const TextCell = styled('div')({
-  width: '100%',
-  overflow: 'hidden',
-  display: '-webkit-box',
-  whiteSpace: 'normal',
-  lineHeight: 1.2,
-  '-webkit-box-orient': 'vertical',
-  '-webkit-line-clamp': 3,
-});
 
 const COLUMNS: GridColDef[] = [
   {
