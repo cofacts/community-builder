@@ -33,13 +33,34 @@ const ChartLine = styled.path`
   fill: none;
 `;
 
-type Point = { web: number; line: number; date: Date };
+type Point = {
+  web: number;
+  line: number;
+  date: Date;
+  lineDetail: {
+    /** Visit number to Cofacts official LINE bot */
+    cofacts: number;
+    /** Visit from LIFF of various sources */
+    liff: { [source: string]: number };
+  };
+};
 
 type Props = {
   articleEdges: NonNullable<LoadAnalyticsQuery['ListArticles']>['edges'];
 } & React.ComponentPropsWithoutRef<'div'>;
 
 const MARGIN = 48;
+
+function getEmptyStat(): Omit<Point, 'date'> {
+  return {
+    web: 0,
+    line: 0,
+    lineDetail: {
+      cofacts: 0,
+      liff: {},
+    },
+  };
+}
 
 function TrendPlot({ articleEdges, ...containerProps }: Props) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -56,7 +77,7 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
     totalLineVisit,
   ] = useMemo(() => {
     const unixTsToDataMap = articleEdges.reduce<
-      Map</* unix timestamp */ number, { web: number; line: number }>
+      Map</* unix timestamp */ number, Omit<Point, 'date'>>
     >((agg, { node }) => {
       for (const stat of node.stats ?? []) {
         if (!stat) continue; // Make Typescript happy
@@ -67,14 +88,20 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
         let statOfTheDay = agg.get(unixTs);
 
         if (!statOfTheDay) {
-          statOfTheDay = { web: 0, line: 0 };
+          statOfTheDay = getEmptyStat();
           agg.set(unixTs, statOfTheDay);
         }
 
         statOfTheDay.web += stat.webVisit ?? 0;
-        statOfTheDay.line +=
-          (stat.lineVisit ?? 0) +
-          (stat.liff ?? []).reduce((sum, entry) => sum + entry.visit, 0);
+        const lineDetail = statOfTheDay.lineDetail;
+        lineDetail.cofacts += stat.lineVisit ?? 0;
+        stat.liff.forEach((liff) => {
+          lineDetail.liff[liff.source] ??= 0;
+          lineDetail.liff[liff.source] += liff.visit;
+        });
+        statOfTheDay.line =
+          lineDetail.cofacts +
+          Object.values(lineDetail.liff).reduce((acc, val) => acc + val, 0);
       }
       return agg;
     }, new Map());
@@ -99,7 +126,7 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
       const statOfTheDay = unixTsToDataMap.get(ts);
       return statOfTheDay
         ? { date, ...statOfTheDay }
-        : { date, web: 0, line: 0 };
+        : { date, ...getEmptyStat() };
     });
 
     const webStats = entries.map(([, { web }]) => web);
