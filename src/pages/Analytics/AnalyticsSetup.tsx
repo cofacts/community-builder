@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Typography from '@mui/material/Typography';
+import DateTimePicker from '../../components/DateTimePicker';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
@@ -38,24 +39,24 @@ const AnalyticsSetup = () => {
             onChange={(e) => setArticleIds(e.target.value)}
             helperText="Enter article IDs separated by commas"
           />
-          <TextField
-            fullWidth
-            margin="normal"
-            name="from"
-            label="From Date"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            helperText="Use ISO date or relative format like 'now-2M'"
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            name="to"
-            label="To Date"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            helperText="Use ISO date or relative format like 'now'"
-          />
+          <div style={{ marginTop: 16, marginBottom: 8 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>
+              From Date
+            </Typography>
+            <DateTimePicker
+              value={fromDate}
+              onChange={(value) => setFromDate(value ?? 'now-2M')}
+            />
+          </div>
+          <div style={{ marginTop: 16, marginBottom: 8 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>
+              To Date
+            </Typography>
+            <DateTimePicker
+              value={toDate}
+              onChange={(value) => setToDate(value ?? 'now')}
+            />
+          </div>
         </CardContent>
         <CardActions>
           <Button color="primary" type="submit" variant="contained">
