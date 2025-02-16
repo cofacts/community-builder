@@ -15,6 +15,7 @@ import EditorWorks from './pages/EditorWorks';
 import BigNumSetup from './pages/BigNumSetup';
 import BigNum from './pages/BigNum';
 import Analytics from './pages/Analytics';
+import AnalyticsSetup from './pages/Analytics/AnalyticsSetup';
 
 const TitleLink = styled(Link)`
   color: inherit;
@@ -36,6 +37,7 @@ const App = () => {
       </AppBar>
       <Routes>
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/analytics/setup" element={<AnalyticsSetup />} />
         <Route
           element={
             <Container sx={{ mt: 2 }} maxWidth="lg">

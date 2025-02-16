@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { TimeRangeInput } from '../../types';
 
 /**
  * Parameters to store in URL search string for analytics page
@@ -35,7 +34,7 @@ export function getSearchString(p: ParamsFromUrl): URLSearchParams {
  * Retrieves the current params from search string, and a function to navigate to new params
  */
 export function useUrlParams(): [ParamsFromUrl, GoFn] {
-  const { search, pathname } = useLocation();
+  const { search } = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(search);
   return [
@@ -45,7 +44,7 @@ export function useUrlParams(): [ParamsFromUrl, GoFn] {
       to: searchParams.get('to') ?? 'now',
     },
     (p) => {
-      navigate(`${pathname}?${getSearchString(p)}`);
+      navigate(`/analytics?${getSearchString(p)}`);
     },
   ];
 }

@@ -61,7 +61,7 @@ const Home = () => {
         description="Instant number display to project in meetups"
       />
       <FunctionButton
-        to="/analytics"
+        to="/analytics/setup"
         title="Analytics"
         description="Web and LINE visit of specified messages"
       />
