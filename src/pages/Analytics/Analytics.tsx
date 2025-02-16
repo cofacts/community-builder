@@ -1,17 +1,23 @@
 import React from 'react';
+import { Alert } from '@mui/material';
 
 import ArticlesTable from './ArticlesTable';
 import TrendPlot from './TrendPlot';
 import { useLoadAnalyticsQuery } from '../../types';
+import { useUrlParams } from './util';
 
 function Analytics() {
+  const [params] = useUrlParams();
+
   const { data, error } = useLoadAnalyticsQuery({
     variables: {
-      // filter: { ids: ['1ijttxdp31nsd', '250oafg9kzopp', '2xpltyroe0qbi'] },
       filter: {
-        ids: ['3orufkwgy9ier', '1jfbosave9lq8'],
+        ids: params.ids,
       },
-      dateRange: { GTE: 'now-2M' },
+      dateRange: {
+        GTE: params.from,
+        LTE: params.to,
+      },
     },
   });
 
@@ -19,6 +25,11 @@ function Analytics() {
 
   return (
     <>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error.message}
+        </Alert>
+      )}
       <TrendPlot articleEdges={articleEdges} style={{ height: 400 }} />
       <div style={{ height: 500 }}>
         <ArticlesTable articleEdges={articleEdges} />
