@@ -108,8 +108,9 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
     return [
       points,
       timeRange,
-      max(webStats) ?? 0,
-      max(lineStats) ?? 0,
+      // Make max web/line visit to be at least 1 so that its y-axis does not go to center
+      max([...webStats, 1]) ?? 1,
+      max([...lineStats, 1]) ?? 1,
       webStats.reduce((sum, v) => sum + v, 0),
       lineStats.reduce((sum, v) => sum + v, 0),
     ];
@@ -118,10 +119,12 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
   const sizeProps = useSize(chartContainerRef);
   const xScale = scaleTime()
     .domain(timeRange)
-    .range([MARGIN, sizeProps ? sizeProps.width - MARGIN : 0]);
+    .range([MARGIN, sizeProps ? sizeProps.width - MARGIN : 0])
+    .nice();
   const webScale = scaleLinear()
     .domain([0, maxWebVisit])
-    .range([sizeProps ? sizeProps.height - MARGIN : 0, MARGIN]);
+    .range([sizeProps ? sizeProps.height - MARGIN : 0, MARGIN])
+    .nice();
   const webLineFn = line<Point>(
     (p) => xScale(p.date),
     (p) => webScale(p.web)
@@ -179,36 +182,42 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
 
         {/* Y-axis for web */}
         <Axis style={{ top: 0, bottom: 0, left: 0, color: 'blue' }}>
-          {webScale.ticks().map((value, i) => (
-            <span
-              style={{
-                top: webScale(value),
-                width: MARGIN,
-                transform: 'translateY(-50%)',
-                textAlign: 'right',
-              }}
-              key={i}
-            >
-              {numberFormatter.format(value)}
-            </span>
-          ))}
+          {webScale
+            .ticks()
+            .filter(Number.isInteger)
+            .map((value, i) => (
+              <span
+                style={{
+                  top: webScale(value),
+                  width: MARGIN,
+                  transform: 'translateY(-50%)',
+                  textAlign: 'right',
+                }}
+                key={i}
+              >
+                {numberFormatter.format(value)}
+              </span>
+            ))}
         </Axis>
 
         {/* Y-axis for LINE */}
         <Axis style={{ top: 0, bottom: 0, right: 0, color: 'green' }}>
-          {lineScale.ticks().map((value, i) => (
-            <span
-              style={{
-                top: lineScale(value),
-                width: MARGIN,
-                transform: 'translateY(-50%)',
-                right: 0,
-              }}
-              key={i}
-            >
-              {numberFormatter.format(value)}
-            </span>
-          ))}
+          {lineScale
+            .ticks()
+            .filter(Number.isInteger)
+            .map((value, i) => (
+              <span
+                style={{
+                  top: lineScale(value),
+                  width: MARGIN,
+                  transform: 'translateY(-50%)',
+                  right: 0,
+                }}
+                key={i}
+              >
+                {numberFormatter.format(value)}
+              </span>
+            ))}
         </Axis>
       </ChartContainer>
     </>
