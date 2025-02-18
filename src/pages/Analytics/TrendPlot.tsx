@@ -187,8 +187,7 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
   const sizeProps = useSize(chartContainerRef);
   const xScale = scaleTime()
     .domain(timeRange)
-    .range([MARGIN, sizeProps ? sizeProps.width - MARGIN : 0])
-    .nice();
+    .range([MARGIN, sizeProps ? sizeProps.width - MARGIN : 0]);
   const webScale = scaleLinear()
     .domain([0, maxWebVisit])
     .range([sizeProps ? sizeProps.height - MARGIN : 0, MARGIN])
@@ -199,11 +198,17 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
   ).curve(curveMonotoneX);
   const lineScale = scaleLinear()
     .domain([0, maxLineVisit])
-    .range([sizeProps ? sizeProps.height - MARGIN : 0, MARGIN]);
+    .range([sizeProps ? sizeProps.height - MARGIN : 0, MARGIN])
+    .nice();
   const lineLineFn = line<Point>(
     (p) => xScale(p.date),
     (p) => lineScale(p.line)
   ).curve(curveMonotoneX);
+
+  /** The width of the hitbox */
+  const hitboxWidth =
+    Math.max(sizeProps?.width ?? 0 - 2 * MARGIN, 0) /
+    (points.length - 1); /* For n points, there are n-1 spaces between them */
 
   return (
     <>
@@ -236,26 +241,14 @@ function TrendPlot({ articleEdges, ...containerProps }: Props) {
         {points.map((point, idx) => {
           if (!sizeProps) return null;
 
-          // Calculate hitbox width - use half the distance to adjacent points
-          const prevX = idx > 0 ? xScale(points[idx - 1].date) : MARGIN;
-          const nextX =
-            idx < points.length - 1
-              ? xScale(points[idx + 1].date)
-              : sizeProps.width - MARGIN;
-          const x = xScale(point.date);
-
-          const hitboxLeft = (prevX + x) / 2;
-          const hitboxRight = (nextX + x) / 2;
-          const width = hitboxRight - hitboxLeft;
-
           const avgY = (webScale(point.web) + lineScale(point.line)) / 2;
 
           return (
             <HitboxDiv
               key={point.date.getTime()}
               style={{
-                left: hitboxLeft,
-                width,
+                left: xScale(point.date) - hitboxWidth / 2,
+                width: hitboxWidth,
               }}
             >
               <Dot
