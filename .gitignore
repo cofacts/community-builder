@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Prevent google-github-actions/auth credentials being committed to git by accident
+gha-creds-*.json
